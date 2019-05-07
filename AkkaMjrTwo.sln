@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMjrTwo.UI", "UI\AkkaMjrTwo.UI.csproj", "{AA0692E2-ABA8-459C-B4E9-FFF1D7208405}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.UI", "UI\AkkaMjrTwo.UI.csproj", "{AA0692E2-ABA8-459C-B4E9-FFF1D7208405}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMjrTwo.GameEngine", "GameEngine\AkkaMjrTwo.GameEngine.csproj", "{CCEF98A7-EB2A-4C3D-A995-8DA77FFDB184}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.GameEngine", "GameEngine\AkkaMjrTwo.GameEngine.csproj", "{CCEF98A7-EB2A-4C3D-A995-8DA77FFDB184}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMjrTwo.Statistics", "Statistics\AkkaMjrTwo.Statistics.csproj", "{F3ACDA5C-86DF-4556-A755-72FE4B23A9A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.Statistics", "Statistics\AkkaMjrTwo.Statistics.csproj", "{F3ACDA5C-86DF-4556-A755-72FE4B23A9A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +31,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {70AEC83A-23D3-475B-8C83-29F5116FCBF9}
 	EndGlobalSection
