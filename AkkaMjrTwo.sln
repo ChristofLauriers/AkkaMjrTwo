@@ -3,7 +3,31 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMjrTwo.UI", "UI\AkkaMjrTwo.UI.csproj", "{AA0692E2-ABA8-459C-B4E9-FFF1D7208405}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMjrTwo.GameEngine", "GameEngine\AkkaMjrTwo.GameEngine.csproj", "{CCEF98A7-EB2A-4C3D-A995-8DA77FFDB184}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMjrTwo.Statistics", "Statistics\AkkaMjrTwo.Statistics.csproj", "{F3ACDA5C-86DF-4556-A755-72FE4B23A9A9}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA0692E2-ABA8-459C-B4E9-FFF1D7208405}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA0692E2-ABA8-459C-B4E9-FFF1D7208405}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA0692E2-ABA8-459C-B4E9-FFF1D7208405}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA0692E2-ABA8-459C-B4E9-FFF1D7208405}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCEF98A7-EB2A-4C3D-A995-8DA77FFDB184}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCEF98A7-EB2A-4C3D-A995-8DA77FFDB184}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCEF98A7-EB2A-4C3D-A995-8DA77FFDB184}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCEF98A7-EB2A-4C3D-A995-8DA77FFDB184}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3ACDA5C-86DF-4556-A755-72FE4B23A9A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3ACDA5C-86DF-4556-A755-72FE4B23A9A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3ACDA5C-86DF-4556-A755-72FE4B23A9A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3ACDA5C-86DF-4556-A755-72FE4B23A9A9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
