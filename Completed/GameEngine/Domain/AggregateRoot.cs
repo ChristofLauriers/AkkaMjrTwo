@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace AkkaMjrTwo.GameEngine.Domain
@@ -17,7 +15,16 @@ namespace AkkaMjrTwo.GameEngine.Domain
         }
 
         protected abstract T ApplyEvent(E arg);
-        //protected abstract T ApplyEvents(params E[] args);
         protected abstract T MarkCommitted();
+
+        protected T ApplyEvents(params E[] args)
+        {
+            T result = null;
+            foreach (E arg in args)
+            {
+                result = ApplyEvent(arg);
+            }
+            return result;
+        }
     }
 }

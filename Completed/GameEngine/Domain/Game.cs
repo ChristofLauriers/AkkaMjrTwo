@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using AkkaMjrTwo.GameEngine.Config;
 
 namespace AkkaMjrTwo.GameEngine.Domain
 {
@@ -37,6 +38,16 @@ namespace AkkaMjrTwo.GameEngine.Domain
             return this;
         }
 
+        public bool IsFinsihed()
+        {
+            return this is FinishedGame;
+        }
+
+        public bool IsRunning()
+        {
+            return this is RunningGame;
+        }
+
         protected override Game MarkCommitted()
         {
             UncommitedEvents = new List<GameEvent>();
@@ -61,32 +72,42 @@ namespace AkkaMjrTwo.GameEngine.Domain
             }
 
             var firstPlayer = players.First();
-            //ApplyEvents(new GameStarted(GameId, players, new Turn(firstPlayer, ))
+            ApplyEvents(new GameStarted(GameId, players, new Turn(firstPlayer, GlobalSettings.TurnTimeoutSeconds)));
             return this;
         }
 
         protected override Game ApplyEvent(GameEvent arg)
         {
+            if (arg is GameStarted)
+            {
+                var evnt = arg as GameStarted;
+
+                UncommitedEvents.Add(evnt);
+                return new RunningGame(GameId, evnt.Players, evnt.InitialTurn, UncommitedEvents);
+            }
             return this;
         }
     }
 
+
+
     public class RunningGame : Game
     {
         private readonly Random _random;
+        private readonly List<KeyValuePair<PlayerId, int>> _rolledNumbers;
 
         public List<PlayerId> Players { get; private set; }
         public Turn Turn { get; private set; }
-        public List<KeyValuePair<PlayerId, int>> RolledNumbers { get; private set; }
 
-        public RunningGame(GameId id, List<PlayerId> players, Turn turn, List<KeyValuePair<PlayerId, int>> rolledNumbers)
+        public RunningGame(GameId id, List<PlayerId> players, Turn turn, List<GameEvent> uncommitedEvents)
             : base(id)
         {
             _random = new Random();
+            _rolledNumbers = new List<KeyValuePair<PlayerId, int>>();
 
             Players = players;
             Turn = turn;
-            RolledNumbers = rolledNumbers;
+            UncommitedEvents = uncommitedEvents;
         }
 
         public Game Roll(PlayerId player)
@@ -99,11 +120,15 @@ namespace AkkaMjrTwo.GameEngine.Domain
                 var nextPlayer = GetNextPlayer();
                 if (nextPlayer != null)
                 {
-                    //ApplyEvents
+                    ApplyEvents(diceRolled, new TurnChanged(GameId, new Turn(nextPlayer, GlobalSettings.TurnTimeoutSeconds)));
                 }
                 else
                 {
-                    //ApplyEvent
+                    var game = ApplyEvent(diceRolled);
+                    if (game is RunningGame)
+                    {
+                        ApplyEvent(new GameFinished(GameId, BestPlayers()));
+                    }
                 }
                 return this;
             }
@@ -113,12 +138,12 @@ namespace AkkaMjrTwo.GameEngine.Domain
         public List<PlayerId> BestPlayers()
         {
             var highest = HighestRolledNumber();
-            return RolledNumbers.Where(x => x.Value == highest).Select(x => x.Key).ToList();
+            return _rolledNumbers.Where(x => x.Value == highest).Select(x => x.Key).ToList();
         }
 
         public int HighestRolledNumber()
         {
-            return RolledNumbers.Select(x => x.Value).Max();
+            return _rolledNumbers.Select(x => x.Value).Max();
         }
 
         public Game TickCountDown()
@@ -130,11 +155,11 @@ namespace AkkaMjrTwo.GameEngine.Domain
                 var nextPlayer = GetNextPlayer();
                 if (nextPlayer != null)
                 {
-                    //ApplyEvents
+                    ApplyEvents(countdownUpdated, timedOut, new TurnChanged(GameId, new Turn(nextPlayer, GlobalSettings.TurnTimeoutSeconds)));
                 }
                 else
                 {
-                    //ApplyEvents
+                    ApplyEvents(countdownUpdated, timedOut, new GameFinished(GameId, BestPlayers()));
                 }
             }
             else
@@ -158,7 +183,7 @@ namespace AkkaMjrTwo.GameEngine.Domain
             if (arg is DiceRolled)
             {
                 var evnt = arg as DiceRolled;
-                RolledNumbers.Add(new KeyValuePair<PlayerId, int>(Turn.CurrentPlayer, evnt.Rollednumber));
+                _rolledNumbers.Add(new KeyValuePair<PlayerId, int>(Turn.CurrentPlayer, evnt.Rollednumber));
                 handled = true;
             }
             if (arg is TurnCountdownUpdated)
@@ -194,15 +219,19 @@ namespace AkkaMjrTwo.GameEngine.Domain
         }
     }
 
+
+
     public class FinishedGame : Game
     {
         public List<PlayerId> Players { get; private set; }
         public List<PlayerId> Winners { get; private set; }
-    
-        public FinishedGame(GameId id, List<PlayerId> players, List<PlayerId> winners)
+
+        public FinishedGame(GameId id, List<PlayerId> players, List<PlayerId> winners, List<GameEvent> uncommitedEvents)
             : base(id)
         {
-
+            Players = players;
+            Winners = winners;
+            UncommitedEvents = uncommitedEvents;
         }
 
         protected override Game ApplyEvent(GameEvent arg)
