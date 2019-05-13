@@ -18,11 +18,11 @@ namespace AkkaMjrTwo.GameEngine.Domain
 
     public class RollDice : GameCommand
     {
-        public string PlayerId { get; private set; }
+        public PlayerId Player { get; private set; }
 
-        public RollDice(string playerId)
+        public RollDice(PlayerId player)
         {
-            PlayerId = playerId;
+            Player = player;
         }
     }
 }

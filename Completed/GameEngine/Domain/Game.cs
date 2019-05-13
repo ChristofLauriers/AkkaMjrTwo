@@ -1,14 +1,13 @@
-﻿using System;
+﻿using AkkaMjrTwo.GameEngine.Config;
+using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using AkkaMjrTwo.GameEngine.Config;
 
 namespace AkkaMjrTwo.GameEngine.Domain
 {
     public abstract class Game : AggregateRoot<Game, GameEvent>
     {
-        public GameId GameId { get { return Id as GameId; } }
+        protected GameId GameId => Id as GameId;
 
         protected Game(GameId id)
             : base(id)
@@ -22,18 +21,22 @@ namespace AkkaMjrTwo.GameEngine.Domain
 
         public Game HandleCommand(GameCommand command)
         {
-            if (command is StartGame)
+            if (command is StartGame game)
             {
                 if (this is UninitializedGame)
                 {
-                    return (this as UninitializedGame).Start((command as StartGame).Players);
+                    return (this as UninitializedGame).Start(game.Players);
                 }
                 else throw new GameAlreadyStartedViolation();
             }
 
-            if (command is RollDice)
+            if (command is RollDice dice)
             {
-
+                if (this is RunningGame)
+                {
+                    return (this as RunningGame).Roll(dice.Player);
+                }
+                else throw new GameNotRunningViolation();
             }
             return this;
         }
@@ -112,7 +115,7 @@ namespace AkkaMjrTwo.GameEngine.Domain
 
         public Game Roll(PlayerId player)
         {
-            if (Turn.CurrentPlayer == player)
+            if (Turn.CurrentPlayer.Equals(player))
             {
                 var rolledNumber = _random.Next(1, 7);
                 var diceRolled = new DiceRolled(GameId, rolledNumber);
@@ -172,38 +175,31 @@ namespace AkkaMjrTwo.GameEngine.Domain
         protected override Game ApplyEvent(GameEvent arg)
         {
             Game game = this;
-            var handled = false;
-
             if (arg is TurnChanged)
             {
                 var evnt = arg as TurnChanged;
                 Turn = evnt.Turn;
-                handled = true;
+                UncommitedEvents.Add(arg);
             }
             if (arg is DiceRolled)
             {
                 var evnt = arg as DiceRolled;
                 _rolledNumbers.Add(new KeyValuePair<PlayerId, int>(Turn.CurrentPlayer, evnt.Rollednumber));
-                handled = true;
+                UncommitedEvents.Add(arg);
             }
             if (arg is TurnCountdownUpdated)
             {
                 var evnt = arg as TurnCountdownUpdated;
                 Turn.SecondsLeft = evnt.SecondsLeft;
-                handled = true;
+                UncommitedEvents.Add(arg);
             }
             if (arg is GameFinished)
             {
                 var evnt = arg as GameFinished;
-                game = new FinishedGame(GameId, Players, evnt.Winners);
-                handled = true;
+                UncommitedEvents.Add(arg);
+                return new FinishedGame(GameId, Players, evnt.Winners, UncommitedEvents);
             }
             if (arg is TurnTimedOut)
-            {
-                handled = true;
-            }
-
-            if (handled)
             {
                 UncommitedEvents.Add(arg);
             }
@@ -239,6 +235,7 @@ namespace AkkaMjrTwo.GameEngine.Domain
             return this;
         }
     }
+
 
 
     public class Turn
