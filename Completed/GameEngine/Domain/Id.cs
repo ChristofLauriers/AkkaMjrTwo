@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace AkkaMjrTwo.GameEngine.Domain
 {
     public class Id<T> : IEquatable<Id<T>>

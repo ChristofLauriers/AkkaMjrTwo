@@ -1,7 +1,9 @@
-﻿using Akka.Actor;
+﻿using Akka;
+using Akka.Actor;
 using Akka.Persistence;
 using AkkaMjrTwo.GameEngine.Domain;
 using System;
+using System.Collections.Generic;
 
 namespace AkkaMjrTwo.GameEngine.Actor
 {
@@ -17,8 +19,8 @@ namespace AkkaMjrTwo.GameEngine.Actor
 
     public class CommandRejected : CommandResult
     {
-        public GameRuleViolation Violation { get; private set; }    
-        
+        public GameRuleViolation Violation { get; private set; }
+
         public CommandRejected(GameRuleViolation violation)
         {
             Violation = violation;
@@ -30,12 +32,16 @@ namespace AkkaMjrTwo.GameEngine.Actor
     public class GameActor : PersistentActor
     {
         private Game _game;
+        private GameId _id;
+        private List<ICancelable> _cancelable;
 
-        public override string PersistenceId => throw new NotImplementedException();
+        public override string PersistenceId => _id.Value;
 
         public GameActor(GameId id)
         {
+            _id = id;
             _game = Game.Create(id);
+            _cancelable = new List<ICancelable>();
         }
 
         public static Props GetProps(GameId id)
@@ -45,39 +51,36 @@ namespace AkkaMjrTwo.GameEngine.Actor
 
         protected override bool ReceiveCommand(object message)
         {
-            if (message is GameCommand command)
-            {
-                HandleResult(_game.HandleCommand, command);
-            }
-            else if (message is TickCountdown)
-            {
-                if (_game is RunningGame game)
+            return message.Match()
+                .With<GameCommand>(cmd =>
                 {
-                    HandleChanges(game.TickCountDown());
-                }
-            }
-            else
-            {
-                Context.System.Log.Warning("Game is not running, cannot update countdown");
-            }
-            return true;
+                    HandleResult(_game.HandleCommand, cmd);
+                })
+                .With<TickCountdown>(() =>
+                {
+                    if (_game is RunningGame game)
+                    {
+                        _game = game.TickCountDown();
+                        HandleChanges();
+                    }
+                })
+                .Default((o) =>
+                {
+                    Context.System.Log.Warning("Game is not running, cannot update countdown");
+                    CancelCountdownTick();
+                })
+                .WasHandled;
         }
-
-        protected override bool ReceiveRecover(object message)
-        {
-            throw new NotImplementedException();
-        }
-
 
         private void HandleResult(Func<GameCommand, Game> commandHandler, GameCommand command)
         {
             try
             {
-                var game = commandHandler.Invoke(command);
+                _game = commandHandler.Invoke(command);
 
                 Sender.Tell(new CommandAccepted());
 
-                HandleChanges(game);
+                HandleChanges();
             }
             catch (GameRuleViolation violation)
             {
@@ -85,14 +88,72 @@ namespace AkkaMjrTwo.GameEngine.Actor
             }
         }
 
-        private void HandleChanges(Game game)
+        private void HandleChanges()
         {
+            foreach (var @event in _game.UncommitedEvents)
+            {
+                Persist(@event, ev =>
+                {
+                    _game = _game.ApplyEvent(ev).MarkCommitted();
 
+                    PublishEvent(ev);
+
+                    ev.Match()
+                      .With<GameStarted>(() =>
+                      {
+                          ScheduleCountdownTick();
+                      })
+                      .With<TurnChanged>(() =>
+                      {
+                          CancelCountdownTick();
+                          ScheduleCountdownTick();
+                      })
+                      .With<GameFinished>(() =>
+                      {
+                          CancelCountdownTick();
+                          Context.Stop(this.Self);
+                      });
+                });
+            }
+        }
+
+        protected override bool ReceiveRecover(object message)
+        {
+            return message.Match()
+                .With<GameEvent>((ev) =>
+                {
+                    _game = _game.ApplyEvent(ev);
+                })
+                .With<RecoveryCompleted>(() =>
+                {
+                    if (_game.IsRunning)
+                    {
+                        ScheduleCountdownTick();
+                    }
+                })
+                .WasHandled;
+        }
+
+        private void PublishEvent(GameEvent @event)
+        {
+            Context.System.EventStream.Publish(@event);
+        }
+
+        private void ScheduleCountdownTick()
+        {
+            var cancelable = Context.System.Scheduler.ScheduleTellRepeatedlyCancelable(TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(1), this.Self, new TickCountdown(), ActorRefs.NoSender);
+
+            _cancelable.Add(cancelable);
         }
 
         private void CancelCountdownTick()
         {
-
+            foreach (var cancelable in _cancelable)
+            {
+                cancelable.Cancel();
+            }
+            _cancelable.Clear();
         }
 
         private class TickCountdown

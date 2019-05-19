@@ -3,8 +3,9 @@
 namespace AkkaMjrTwo.GameEngine.Domain
 {
     public abstract class GameCommand
-    {
-    }
+    { }
+
+
 
     public class StartGame : GameCommand
     {
@@ -15,6 +16,8 @@ namespace AkkaMjrTwo.GameEngine.Domain
             Players = players;
         }
     }
+
+
 
     public class RollDice : GameCommand
     {

@@ -1,4 +1,5 @@
-﻿using Akka.Actor;
+﻿using Akka;
+using Akka.Actor;
 using Akka.Streams.Actors;
 using AkkaMjrTwo.GameEngine.Domain;
 using System.Collections.Generic;
@@ -8,11 +9,11 @@ namespace AkkaMjrTwo.GameEngine.Actor
 {
     public class EventPublisherActor : ActorPublisher<GameEvent>
     {
-        private List<GameEvent> _eventCache;
+        private List<GameEvent> _buffer;
 
         public EventPublisherActor()
         {
-            _eventCache = new List<GameEvent>();
+            _buffer = new List<GameEvent>();
 
             Context.System.EventStream.Subscribe(Context.Self, typeof(GameEvent));
         }
@@ -24,30 +25,39 @@ namespace AkkaMjrTwo.GameEngine.Actor
 
         protected override bool Receive(object message)
         {
-            if(message is Request)
-            {
-                while (IsActive && TotalDemand > 0 && _eventCache.Count > 0)
+            return message.Match()
+                .With<GameEvent>(ev =>
                 {
-                    var head = _eventCache.First();
-                    var tail = _eventCache.Skip(1);
+                    if (_buffer.Count == 0 && TotalDemand > 0)
+                    {
+                        OnNext(ev);
+                    }
+                    else
+                    {
+                        _buffer.Add(ev);
+                        DeliverBuffer();
+                    }
+                })
+                .With<Request>(DeliverBuffer)
+                .With<Cancel>(() => Context.Stop(Self))
+                .WasHandled;
+        }
 
-                    OnNext(head);
-
-                    _eventCache = tail.ToList();
-                }
-            }
-            else if (message is GameEvent @event)
+        private void DeliverBuffer()
+        {
+            if (TotalDemand > 0)
             {
-                if (IsActive && TotalDemand > 0)
-                {
-                    OnNext(@event);
-                }
-                else
-                {
-                    _eventCache.Add(@event);
-                }
+                var use = _buffer.Take((int)TotalDemand).ToList();
+                _buffer = _buffer.Skip((int)TotalDemand).ToList();
+                use.ForEach(OnNext);
             }
-            return true;
+            else
+            {
+                var use = _buffer.Take(int.MaxValue).ToList();
+                _buffer = _buffer.Skip(int.MaxValue).ToList();
+                use.ForEach(OnNext);
+                DeliverBuffer();
+            }
         }
     }
 }

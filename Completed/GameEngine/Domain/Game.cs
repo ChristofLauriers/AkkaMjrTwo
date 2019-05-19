@@ -7,6 +7,9 @@ namespace AkkaMjrTwo.GameEngine.Domain
 {
     public abstract class Game : AggregateRoot<Game, GameEvent>
     {
+        public bool IsFinished { get { return this is FinishedGame; } }
+        public bool IsRunning { get { return this is RunningGame; } }
+
         protected GameId GameId => Id as GameId;
 
         protected Game(GameId id)
@@ -41,17 +44,7 @@ namespace AkkaMjrTwo.GameEngine.Domain
             return this;
         }
 
-        public bool IsFinsihed()
-        {
-            return this is FinishedGame;
-        }
-
-        public bool IsRunning()
-        {
-            return this is RunningGame;
-        }
-
-        protected override Game MarkCommitted()
+        public override Game MarkCommitted()
         {
             UncommitedEvents = new List<GameEvent>();
             return this;
@@ -79,7 +72,7 @@ namespace AkkaMjrTwo.GameEngine.Domain
             return this;
         }
 
-        protected override Game ApplyEvent(GameEvent arg)
+        public override Game ApplyEvent(GameEvent arg)
         {
             if (arg is GameStarted)
             {
@@ -172,7 +165,7 @@ namespace AkkaMjrTwo.GameEngine.Domain
             return this;
         }
 
-        protected override Game ApplyEvent(GameEvent arg)
+        public override Game ApplyEvent(GameEvent arg)
         {
             Game game = this;
             if (arg is TurnChanged)
@@ -230,7 +223,7 @@ namespace AkkaMjrTwo.GameEngine.Domain
             UncommitedEvents = uncommitedEvents;
         }
 
-        protected override Game ApplyEvent(GameEvent arg)
+        public override Game ApplyEvent(GameEvent arg)
         {
             return this;
         }
