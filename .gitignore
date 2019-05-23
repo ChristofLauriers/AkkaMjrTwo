@@ -260,7 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 
-.DS_Store
-
 Completed/.DS_Store
 .DS_Store
