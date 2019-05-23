@@ -72,6 +72,43 @@ namespace AkkaMjrTwo.GameEngine.Actor
                 .WasHandled;
         }
 
+        protected override bool ReceiveRecover(object message)
+        {
+            return message.Match()
+                .With<GameEvent>((ev) =>
+                {
+                    _game = _game.ApplyEvent(ev);
+                })
+                .With<RecoveryCompleted>(() =>
+                {
+                    if (_game.IsRunning)
+                    {
+                        ScheduleCountdownTick();
+                    }
+                })
+                .WasHandled;
+        }
+
+        protected override void OnPersistFailure(Exception cause, object @event, long sequenceNr)
+        {
+            base.OnPersistFailure(cause, @event, sequenceNr);
+        }
+
+        protected override void OnPersistRejected(Exception cause, object @event, long sequenceNr)
+        {
+            base.OnPersistRejected(cause, @event, sequenceNr);
+        }
+
+        protected override void PreRestart(Exception reason, object message)
+        {
+            base.PreRestart(reason, message);
+        }
+
+        protected override void Unhandled(object message)
+        {
+            base.Unhandled(message);
+        }
+
         private void HandleResult(Func<GameCommand, Game> commandHandler, GameCommand command)
         {
             try
@@ -115,23 +152,6 @@ namespace AkkaMjrTwo.GameEngine.Actor
                       });
                 });
             }
-        }
-
-        protected override bool ReceiveRecover(object message)
-        {
-            return message.Match()
-                .With<GameEvent>((ev) =>
-                {
-                    _game = _game.ApplyEvent(ev);
-                })
-                .With<RecoveryCompleted>(() =>
-                {
-                    if (_game.IsRunning)
-                    {
-                        ScheduleCountdownTick();
-                    }
-                })
-                .WasHandled;
         }
 
         private void PublishEvent(GameEvent @event)

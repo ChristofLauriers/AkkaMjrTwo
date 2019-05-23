@@ -1,6 +1,6 @@
 ﻿using Akka.Actor;
 
-namespace AkkaMjrTwo.GameEngine.Api
+namespace AkkaMjrTwo.GameEngine.Infrastructure
 {
     public delegate IActorRef GameManagerActorProvider();
 }

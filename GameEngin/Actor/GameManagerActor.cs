@@ -44,10 +44,14 @@ namespace AkkaMjrTwo.GameEngine.Actor
     { }
 
 
+    public class GameAlreadyExists
+    { }
 
-    public class GameManager : ReceiveActor
+
+
+    public class GameManagerActor : ReceiveActor
     {
-        public GameManager()
+        public GameManagerActor()
         {
             Receive<CreateGame>(Handle);
             Receive<SendCommand>(Handle);
@@ -55,12 +59,19 @@ namespace AkkaMjrTwo.GameEngine.Actor
 
         public static Props GetProps()
         {
-            return Props.Create<GameManager>();
+            return Props.Create<GameManagerActor>();
         }
 
         private bool Handle(CreateGame command)
         {
             var id = new GameId(Guid.NewGuid().ToString());
+
+            var gameActor = Context.Child(id.Value);
+            if (!gameActor.Equals(ActorRefs.Nobody))
+            {
+                Sender.Tell(new GameAlreadyExists());
+                return true;
+            }
 
             Context.ActorOf(GameActor.GetProps(id), id.Value);
 

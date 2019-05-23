@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Akka.Configuration;
 
-namespace AkkaMjrTwo.GameEngine.Api
+namespace AkkaMjrTwo.GameEngine.Infrastructure
 {
     public static class ConfigurationLoader
     {

@@ -5,17 +5,18 @@ using AkkaMjrTwo.GameEngine.Actor;
 using AkkaMjrTwo.GameEngine.Api.Attributes;
 using AkkaMjrTwo.GameEngine.Api.Model;
 using AkkaMjrTwo.GameEngine.Domain;
+using AkkaMjrTwo.GameEngine.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AkkaMjrTwo.GameEngine.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/game")]
     [ApiController]
-    public class GameApi : ControllerBase
+    public class GameController : ControllerBase
     {
         private readonly IActorRef _gameManagerActor;
 
-        public GameApi(GameManagerActorProvider gameManagerActorProvider)
+        public GameController(GameManagerActorProvider gameManagerActorProvider)
         {
             _gameManagerActor = gameManagerActorProvider();
         }
@@ -35,15 +36,15 @@ namespace AkkaMjrTwo.GameEngine.Api.Controllers
         public async Task<ActionResult> Start(StartGameRequest request)
         {
             var playerIds = new List<PlayerId>();
-            foreach(var str in request.Players)
+            foreach (var str in request.Players)
             {
                 playerIds.Add(new PlayerId(str));
             }
 
             var msg = new SendCommand(new GameId(request.GameId), new StartGame(playerIds));
 
-            var feedback = await _gameManagerActor.Ask<CommandResult>(msg);
-            return Ok(feedback);
+            var feedback = await _gameManagerActor.Ask<object>(msg);
+            return Ok(new { Result = feedback.GetType().Name });
         }
 
         [RequestLoggingActionFilter]
@@ -53,8 +54,8 @@ namespace AkkaMjrTwo.GameEngine.Api.Controllers
         {
             var msg = new SendCommand(new GameId(request.GameId), new RollDice(new PlayerId(request.PlayerId)));
 
-            var feedback = await _gameManagerActor.Ask<CommandResult>(msg);
-            return Ok(feedback);
+            var feedback = await _gameManagerActor.Ask<object>(msg);
+            return Ok(new { Result = feedback.GetType().Name });
         }
     }
 }

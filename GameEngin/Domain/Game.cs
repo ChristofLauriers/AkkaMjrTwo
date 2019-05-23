@@ -139,6 +139,9 @@ namespace AkkaMjrTwo.GameEngine.Domain
 
         public int HighestRolledNumber()
         {
+            if (!_rolledNumbers.Any())
+                return -1;
+
             return _rolledNumbers.Select(x => x.Value).Max();
         }
 
