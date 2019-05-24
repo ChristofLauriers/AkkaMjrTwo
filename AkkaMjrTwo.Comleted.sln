@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMjrTwo.UI", "Completed\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMjrTwo.Statistics", "Completed\Statistics\AkkaMjrTwo.Statistics.csproj", "{739A0B3A-400A-447A-B8E4-3FF9921DB15B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMjrTwo.GameEngine", "GameEngin\AkkaMjrTwo.GameEngine.csproj", "{3594B4BE-2A4E-410C-B431-4E4626404482}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMjrTwo.GameEngine", "Completed\GameEngine\AkkaMjrTwo.GameEngine.csproj", "{3594B4BE-2A4E-410C-B431-4E4626404482}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
