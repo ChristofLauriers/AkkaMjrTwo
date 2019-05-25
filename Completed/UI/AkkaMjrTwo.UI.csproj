@@ -9,4 +9,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\js\services\" />
+    <Folder Include="wwwroot\js\controllers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Views\Shared\_ValidationScriptsPartial.cshtml" />
+  </ItemGroup>
 </Project>

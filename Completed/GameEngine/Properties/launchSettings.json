@@ -19,7 +19,7 @@
     "GameEngine": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:5001/swagger;http://localhost:5000/swagger",
+      "applicationUrl": "http://localhost:5001/swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
