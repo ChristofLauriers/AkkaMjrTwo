@@ -1,5 +1,6 @@
 ﻿using Akka;
 using Akka.Actor;
+using Akka.Cluster.Tools.PublishSubscribe;
 using Akka.Persistence;
 using AkkaMjrTwo.GameEngine.Domain;
 using System;
@@ -32,8 +33,9 @@ namespace AkkaMjrTwo.GameEngine.Actor
     public class GameActor : PersistentActor
     {
         private Game _game;
-        private GameId _id;
-        private List<ICancelable> _cancelable;
+
+        private readonly GameId _id;
+        private readonly List<ICancelable> _cancelable;
 
         public override string PersistenceId => _id.Value;
 
@@ -156,7 +158,13 @@ namespace AkkaMjrTwo.GameEngine.Actor
 
         private void PublishEvent(GameEvent @event)
         {
-            Context.System.EventStream.Publish(@event);
+            var mediator = DistributedPubSub.Get(Context.System).Mediator;
+            if (mediator == ActorRefs.Nobody)
+            {
+                Log.Error($"Unable to publish event { @event.GetType().Name }. Distributed pub/sub mediator not found.");
+                return;
+            }
+            mediator.Tell(new Publish("game_event", @event));
         }
 
         private void ScheduleCountdownTick()

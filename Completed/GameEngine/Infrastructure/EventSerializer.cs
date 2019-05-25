@@ -9,7 +9,7 @@ namespace AkkaMjrTwo.GameEngine.Infrastructure
     {
         public override bool IncludeManifest => true;
         public override int Identifier => 800;
-
+        
         public EventSerializer(ExtendedActorSystem system)
             : base(system)
         { }
