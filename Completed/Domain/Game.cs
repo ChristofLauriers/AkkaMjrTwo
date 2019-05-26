@@ -1,9 +1,9 @@
-﻿using AkkaMjrTwo.GameEngine.Config;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AkkaMjrTwo.Domain.Config;
 
-namespace AkkaMjrTwo.GameEngine.Domain
+namespace AkkaMjrTwo.Domain
 {
     public abstract class Game : AggregateRoot<Game, GameEvent>
     {
@@ -45,7 +45,7 @@ namespace AkkaMjrTwo.GameEngine.Domain
         }
 
         public override Game MarkCommitted()
-        {
+        {   
             UncommitedEvents = new List<GameEvent>();
             return this;
         }
@@ -134,7 +134,9 @@ namespace AkkaMjrTwo.GameEngine.Domain
         public List<PlayerId> BestPlayers()
         {
             var highest = HighestRolledNumber();
-            return _rolledNumbers.Where(x => x.Value == highest).Select(x => x.Key).ToList();
+            var best = _rolledNumbers.Where(x => x.Value == highest).Select(x => x.Key).ToList();
+
+            return best;
         }
 
         public int HighestRolledNumber()
@@ -180,7 +182,12 @@ namespace AkkaMjrTwo.GameEngine.Domain
             if (arg is DiceRolled)
             {
                 var evnt = arg as DiceRolled;
-                _rolledNumbers.Add(new KeyValuePair<PlayerId, int>(Turn.CurrentPlayer, evnt.Rollednumber));
+
+                if(!_rolledNumbers.Exists(x => x.Key.Equals(Turn.CurrentPlayer)))
+                {
+                    _rolledNumbers.Add(new KeyValuePair<PlayerId, int>(Turn.CurrentPlayer, evnt.RolledNumber));
+                }
+               
                 UncommitedEvents.Add(arg);
             }
             if (arg is TurnCountdownUpdated)

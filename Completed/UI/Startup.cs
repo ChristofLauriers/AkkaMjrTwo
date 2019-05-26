@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading;
+using Akka.Actor;
+using AkkaMjrTwo.Infrastructure;
+using AkkaMjrTwo.UI.Actor;
+using AkkaMjrTwo.UI.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -30,24 +31,31 @@ namespace UI
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddSignalR();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            // Register ActorSystem
+            services.AddSingleton(_ => ConfigureActorSystem());
+
+            services.AddSingleton<EventHubHelper, EventHubHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime lifetime)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
 
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<EventHub>("/hub/event");
+            });
 
             app.UseMvc(routes =>
             {
@@ -55,6 +63,28 @@ namespace UI
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            app.ApplicationServices.GetService<EventHubHelper>()
+                                   .StartAsync(CancellationToken.None);
+
+            //ActorSystem lifetime management
+            lifetime.ApplicationStarted.Register(() =>
+            {
+                app.ApplicationServices.GetService<ActorSystem>(); // start Akka.NET
+            });
+            lifetime.ApplicationStopping.Register(() =>
+            {
+                app.ApplicationServices.GetService<ActorSystem>()?.Terminate().Wait();
+            });
+        }
+
+        private static ActorSystem ConfigureActorSystem()
+        {
+            var actorSystem = ActorSystem.Create("DiceGameSystem", ConfigurationLoader.Load());
+
+            actorSystem.ActorOf(Props.Create<EventSubscriberActor>(), "EventSubscriber");
+
+            return actorSystem;
         }
     }
 }

@@ -22,14 +22,15 @@
 
   <ItemGroup>
     <Folder Include="Actor\" />
-    <Folder Include="Config\" />
-    <Folder Include="Domain\" />
     <Folder Include="Attributes\" />
     <Folder Include="Model\" />
     <Folder Include="Infrastructure\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Infrastructure\TextFileJournal.cs" />
+    <Compile Remove="Infrastructure\ConfigurationLoader.cs" />
+    <Compile Remove="Infrastructure\EventSerializer.cs" />
+    <Compile Remove="Infrastructure\JsonEventSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="akka.json" />
@@ -38,5 +39,9 @@
     <Content Update="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\AkkaMjrTwo.Domain.csproj" />
+    <ProjectReference Include="..\Infrastructure\AkkaMjrTwo.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

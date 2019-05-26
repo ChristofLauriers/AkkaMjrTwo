@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace AkkaMjrTwo.GameEngine.Domain
+namespace AkkaMjrTwo.Domain
 {
     public abstract class GameEvent
     {
-        protected GameId Id { get; private set; }
+        public GameId Id { get; private set; }
 
         protected GameEvent(GameId id)
         {
@@ -14,12 +14,12 @@ namespace AkkaMjrTwo.GameEngine.Domain
 
     public class DiceRolled : GameEvent
     {
-        public int Rollednumber { get; private set; }
+        public int RolledNumber { get; private set; }
 
         public DiceRolled(GameId id, int rolledNumber)
             : base(id)
         {
-            Rollednumber = rolledNumber;
+            RolledNumber = rolledNumber;
         }
     }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AkkaMjrTwo.GameEngine.Domain
+namespace AkkaMjrTwo.Domain
 {
     public abstract class GameRuleViolation : Exception
     { }

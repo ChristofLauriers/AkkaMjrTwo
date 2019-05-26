@@ -1,17 +1,17 @@
 ﻿using System;
 
-namespace AkkaMjrTwo.GameEngine.Domain
+namespace AkkaMjrTwo.Domain
 {
-    public class Id<T> : IEquatable<Id<T>>
+    public class PlayerId : IEquatable<PlayerId>
     {
         public string Value { get; private set; }
 
-        public Id(string value)
+        public PlayerId(string value)
         {
             Value = value;
         }
 
-        public bool Equals(Id<T> other)
+        public bool Equals(PlayerId other)
         {
             return Value == other.Value;
         }
@@ -21,10 +21,10 @@ namespace AkkaMjrTwo.GameEngine.Domain
             if (obj == null)
                 return false;
 
-            if (!(obj is Id<T> id))
+            if (!(obj is PlayerId playerId))
                 return false;
 
-            return Equals(id);
+            return Equals(playerId);
         }
 
         public override int GetHashCode()

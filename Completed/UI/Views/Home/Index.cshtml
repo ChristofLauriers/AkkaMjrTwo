@@ -45,7 +45,7 @@
             </div>
             <div class="col-lg-3">
                 <div ng-hide="gameFinished">
-                    <p>Current player: <strong>{{game.turn.currentPlayer}}</strong></p>
+                    <p>Current player: <strong>{{game.turn.currentPlayer.value}}</strong></p>
                     <p>Time left: <strong>{{game.turn.secondsLeft}}</strong></p>
                 </div>
             </div>
@@ -53,7 +53,7 @@
                 <ul class="list-group">
                     <li class="list-group-item" ng-class="isWinner(score.player) ? 'list-group-item-success' : ''" ng-repeat="score in game.scores">
                         <span class="badge">{{score.score}}</span>
-                        {{score.player}}
+                        {{score.player.value}}
                     </li>
                 </ul>
             </div>

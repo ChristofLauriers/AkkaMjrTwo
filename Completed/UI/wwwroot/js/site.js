@@ -13,7 +13,7 @@
 
         $rootScope.$on('events.GameStarted', function(event, data) {
             $rootScope.game = {
-                players: data.players,
+                players: data.players.map(p => p.value),
                 turn: data.initialTurn,
                 scores: []
             };

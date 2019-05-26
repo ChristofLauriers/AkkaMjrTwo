@@ -1,6 +1,6 @@
 ﻿using System;
 using Akka.Actor;
-using AkkaMjrTwo.GameEngine.Domain;
+using AkkaMjrTwo.Domain;
 
 namespace AkkaMjrTwo.GameEngine.Actor
 {

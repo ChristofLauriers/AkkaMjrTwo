@@ -11,7 +11,7 @@
             $scope.loading = true;
             commandService.createGame(function(data) {
                 $scope.loading = false;
-                $rootScope.gameId = data.id;
+                $rootScope.gameId = data.gameId.value;
                 $rootScope.page = "choose_players";
                 eventService.connect($scope.gameId);
             }, function() {

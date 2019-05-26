@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AkkaMjrTwo.GameEngine.Domain
+namespace AkkaMjrTwo.Domain
 {
     public abstract class GameCommand
     { }

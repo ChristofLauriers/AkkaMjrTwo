@@ -40,17 +40,17 @@
         };
 
         $scope.isWinner = function(player) {
-            return $.inArray(player, $scope.winners) != -1;
+            return $.inArray(player.value, $scope.winners) != -1;
         };
 
         $rootScope.$on('events.TurnChanged', function(event, data) {
-            $scope.selectedPlayer = data.turn.currentPlayer;
+            $scope.selectedPlayer = data.turn.currentPlayer.value;
             $scope.$apply();
         });
 
         $rootScope.$on('events.GameFinished', function(event, data) {
             $scope.gameFinished = true;
-            $scope.winners = data.winners;
+            $scope.winners = data.winners.map(p => p.value);
             $scope.$apply();
         });
 

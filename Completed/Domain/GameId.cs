@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AkkaMjrTwo.GameEngine.Domain
+namespace AkkaMjrTwo.Domain
 {
     public class GameId : Id<Game>
     {

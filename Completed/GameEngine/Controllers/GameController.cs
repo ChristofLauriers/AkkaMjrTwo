@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Akka.Actor;
+using AkkaMjrTwo.Domain;
 using AkkaMjrTwo.GameEngine.Actor;
 using AkkaMjrTwo.GameEngine.Api.Attributes;
 using AkkaMjrTwo.GameEngine.Api.Model;
-using AkkaMjrTwo.GameEngine.Domain;
 using AkkaMjrTwo.GameEngine.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 

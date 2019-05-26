@@ -1,6 +1,7 @@
 ﻿using Akka.Actor;
 using AkkaMjrTwo.GameEngine.Actor;
 using AkkaMjrTwo.GameEngine.Infrastructure;
+using AkkaMjrTwo.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,8 @@ namespace GameEngine
 {
     public class Startup
     {
+        private readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -23,6 +26,18 @@ namespace GameEngine
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(MyAllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader()
+                               .AllowCredentials();
+                    });
+            });
 
             // Register ActorSystem
             services.AddSingleton(_ => ConfigureActorSystem());
@@ -64,6 +79,7 @@ namespace GameEngine
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseHttpsRedirection();
             app.UseMvc();
 
@@ -78,11 +94,9 @@ namespace GameEngine
             });
         }
 
-        private ActorSystem ConfigureActorSystem()
+        private static ActorSystem ConfigureActorSystem()
         {
-            var actorSystem = ActorSystem.Create("DiceGameSystem", ConfigurationLoader.Load());
-
-            return actorSystem;
+            return ActorSystem.Create("DiceGameSystem", ConfigurationLoader.Load());
         }
     }
 }

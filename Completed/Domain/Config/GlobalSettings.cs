@@ -1,5 +1,4 @@
-﻿using System;
-namespace AkkaMjrTwo.GameEngine.Config
+﻿namespace AkkaMjrTwo.Domain.Config
 {
     public static class GlobalSettings
     {

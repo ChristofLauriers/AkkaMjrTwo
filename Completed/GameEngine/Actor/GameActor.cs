@@ -1,10 +1,11 @@
-﻿using Akka;
+﻿using System;
+using System.Collections.Generic;
+using Akka;
 using Akka.Actor;
 using Akka.Cluster.Tools.PublishSubscribe;
 using Akka.Persistence;
-using AkkaMjrTwo.GameEngine.Domain;
-using System;
-using System.Collections.Generic;
+using AkkaMjrTwo.Domain;
+using Newtonsoft.Json;
 
 namespace AkkaMjrTwo.GameEngine.Actor
 {
@@ -91,26 +92,6 @@ namespace AkkaMjrTwo.GameEngine.Actor
                 .WasHandled;
         }
 
-        protected override void OnPersistFailure(Exception cause, object @event, long sequenceNr)
-        {
-            base.OnPersistFailure(cause, @event, sequenceNr);
-        }
-
-        protected override void OnPersistRejected(Exception cause, object @event, long sequenceNr)
-        {
-            base.OnPersistRejected(cause, @event, sequenceNr);
-        }
-
-        protected override void PreRestart(Exception reason, object message)
-        {
-            base.PreRestart(reason, message);
-        }
-
-        protected override void Unhandled(object message)
-        {
-            base.Unhandled(message);
-        }
-
         private void HandleResult(Func<GameCommand, Game> commandHandler, GameCommand command)
         {
             try
@@ -129,9 +110,8 @@ namespace AkkaMjrTwo.GameEngine.Actor
 
         private void HandleChanges()
         {
-            foreach (var @event in _game.UncommitedEvents)
-            {
-                Persist(@event, ev =>
+      
+                PersistAll(_game.UncommitedEvents, ev =>
                 {
                     _game = _game.ApplyEvent(ev).MarkCommitted();
 
@@ -153,7 +133,8 @@ namespace AkkaMjrTwo.GameEngine.Actor
                           Context.Stop(this.Self);
                       });
                 });
-            }
+
+
         }
 
         private void PublishEvent(GameEvent @event)
@@ -164,7 +145,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
                 Log.Error($"Unable to publish event { @event.GetType().Name }. Distributed pub/sub mediator not found.");
                 return;
             }
-            mediator.Tell(new Publish("game_event", @event));
+            mediator.Tell(new Publish($"game_event", @event));
         }
 
         private void ScheduleCountdownTick()
