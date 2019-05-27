@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AkkaMjrTwo.GameEngine.Api.Model
+namespace AkkaMjrTwo.GameEngine.Model
 {
     public class StartGameRequest
     {

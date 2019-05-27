@@ -2,6 +2,6 @@
 {
     public static class GlobalSettings
     {
-        public static int TurnTimeoutSeconds = 3000;
+        public static readonly int TurnTimeoutSeconds = 3000;
     }
 }

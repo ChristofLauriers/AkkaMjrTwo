@@ -1,5 +1,4 @@
-﻿using System;
-namespace AkkaMjrTwo.GameEngine.Api.Model
+﻿namespace AkkaMjrTwo.GameEngine.Model
 {
     public class RollDiceRequest
     {

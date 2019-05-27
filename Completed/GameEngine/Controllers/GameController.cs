@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using Akka.Actor;
 using AkkaMjrTwo.Domain;
 using AkkaMjrTwo.GameEngine.Actor;
-using AkkaMjrTwo.GameEngine.Api.Attributes;
-using AkkaMjrTwo.GameEngine.Api.Model;
+using AkkaMjrTwo.GameEngine.Attributes;
 using AkkaMjrTwo.GameEngine.Infrastructure;
+using AkkaMjrTwo.GameEngine.Model;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AkkaMjrTwo.GameEngine.Api.Controllers
+namespace AkkaMjrTwo.GameEngine.Controllers
 {
     [Route("api/game")]
     [ApiController]

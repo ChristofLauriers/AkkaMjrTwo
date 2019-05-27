@@ -7,8 +7,8 @@ namespace AkkaMjrTwo.Domain
 {
     public abstract class Game : AggregateRoot<Game, GameEvent>
     {
-        public bool IsFinished { get { return this is FinishedGame; } }
-        public bool IsRunning { get { return this is RunningGame; } }
+        public bool IsFinished => this is FinishedGame;
+        public bool IsRunning => this is RunningGame;
 
         protected GameId GameId => Id as GameId;
 
@@ -26,18 +26,18 @@ namespace AkkaMjrTwo.Domain
         {
             if (command is StartGame game)
             {
-                if (this is UninitializedGame)
+                if (this is UninitializedGame uninitializedGame)
                 {
-                    return (this as UninitializedGame).Start(game.Players);
+                    return uninitializedGame.Start(game.Players);
                 }
                 else throw new GameAlreadyStartedViolation();
             }
 
             if (command is RollDice dice)
             {
-                if (this is RunningGame)
+                if (this is RunningGame runningGame)
                 {
-                    return (this as RunningGame).Roll(dice.Player);
+                    return runningGame.Roll(dice.Player);
                 }
                 else throw new GameNotRunningViolation();
             }
@@ -74,12 +74,10 @@ namespace AkkaMjrTwo.Domain
 
         public override Game ApplyEvent(GameEvent arg)
         {
-            if (arg is GameStarted)
+            if (arg is GameStarted gameStarted)
             {
-                var evnt = arg as GameStarted;
-
-                UncommitedEvents.Add(evnt);
-                return new RunningGame(GameId, evnt.Players, evnt.InitialTurn, UncommitedEvents);
+                UncommitedEvents.Add(gameStarted);
+                return new RunningGame(GameId, gameStarted.Players, gameStarted.InitialTurn, UncommitedEvents);
             }
             return this;
         }
@@ -91,24 +89,24 @@ namespace AkkaMjrTwo.Domain
     {
         private readonly Random _random;
         private readonly List<KeyValuePair<PlayerId, int>> _rolledNumbers;
+        private readonly List<PlayerId> _players;
 
-        public List<PlayerId> Players { get; private set; }
-        public Turn Turn { get; private set; }
+        private Turn _turn;
 
         public RunningGame(GameId id, List<PlayerId> players, Turn turn, List<GameEvent> uncommitedEvents)
             : base(id)
         {
             _random = new Random();
             _rolledNumbers = new List<KeyValuePair<PlayerId, int>>();
+            _players = players;
+            _turn = turn;
 
-            Players = players;
-            Turn = turn;
             UncommitedEvents = uncommitedEvents;
         }
 
         public Game Roll(PlayerId player)
         {
-            if (Turn.CurrentPlayer.Equals(player))
+            if (_turn.CurrentPlayer.Equals(player))
             {
                 var rolledNumber = _random.Next(1, 7);
                 var diceRolled = new DiceRolled(GameId, rolledNumber);
@@ -129,28 +127,12 @@ namespace AkkaMjrTwo.Domain
                 return this;
             }
             else throw new NotCurrentPlayerViolation();
-        }
-
-        public List<PlayerId> BestPlayers()
-        {
-            var highest = HighestRolledNumber();
-            var best = _rolledNumbers.Where(x => x.Value == highest).Select(x => x.Key).ToList();
-
-            return best;
-        }
-
-        public int HighestRolledNumber()
-        {
-            if (!_rolledNumbers.Any())
-                return -1;
-
-            return _rolledNumbers.Select(x => x.Value).Max();
-        }
+        }     
 
         public Game TickCountDown()
         {
-            var countdownUpdated = new TurnCountdownUpdated(GameId, Turn.SecondsLeft - 1);
-            if (Turn.SecondsLeft <= 1)
+            var countdownUpdated = new TurnCountdownUpdated(GameId, _turn.SecondsLeft - 1);
+            if (_turn.SecondsLeft <= 1)
             {
                 var timedOut = new TurnTimedOut(GameId);
                 var nextPlayer = GetNextPlayer();
@@ -173,34 +155,29 @@ namespace AkkaMjrTwo.Domain
         public override Game ApplyEvent(GameEvent arg)
         {
             Game game = this;
-            if (arg is TurnChanged)
+            if (arg is TurnChanged turnChanged)
             {
-                var evnt = arg as TurnChanged;
-                Turn = evnt.Turn;
-                UncommitedEvents.Add(arg);
+                _turn = turnChanged.Turn;
+                UncommitedEvents.Add(turnChanged);
             }
-            if (arg is DiceRolled)
+            if (arg is DiceRolled diceRolled)
             {
-                var evnt = arg as DiceRolled;
-
-                if(!_rolledNumbers.Exists(x => x.Key.Equals(Turn.CurrentPlayer)))
+                if(!_rolledNumbers.Exists(x => x.Key.Equals(_turn.CurrentPlayer)))
                 {
-                    _rolledNumbers.Add(new KeyValuePair<PlayerId, int>(Turn.CurrentPlayer, evnt.RolledNumber));
+                    _rolledNumbers.Add(new KeyValuePair<PlayerId, int>(_turn.CurrentPlayer, diceRolled.RolledNumber));
                 }
                
-                UncommitedEvents.Add(arg);
+                UncommitedEvents.Add(diceRolled);
             }
-            if (arg is TurnCountdownUpdated)
+            if (arg is TurnCountdownUpdated turnCountdownUpdated)
             {
-                var evnt = arg as TurnCountdownUpdated;
-                Turn.SecondsLeft = evnt.SecondsLeft;
-                UncommitedEvents.Add(arg);
+                _turn.SecondsLeft = turnCountdownUpdated.SecondsLeft;
+                UncommitedEvents.Add(turnCountdownUpdated);
             }
-            if (arg is GameFinished)
+            if (arg is GameFinished gameFinished)
             {
-                var evnt = arg as GameFinished;
-                UncommitedEvents.Add(arg);
-                return new FinishedGame(GameId, Players, evnt.Winners, UncommitedEvents);
+                UncommitedEvents.Add(gameFinished);
+                return new FinishedGame(GameId, _players, gameFinished.Winners, UncommitedEvents);
             }
             if (arg is TurnTimedOut)
             {
@@ -209,12 +186,28 @@ namespace AkkaMjrTwo.Domain
             return game;
         }
 
+        private List<PlayerId> BestPlayers()
+        {
+            var highest = HighestRolledNumber();
+            var best = _rolledNumbers.Where(x => x.Value == highest).Select(x => x.Key).ToList();
+
+            return best;
+        }
+
+        private int HighestRolledNumber()
+        {
+            if (!_rolledNumbers.Any())
+                return -1;
+
+            return _rolledNumbers.Select(x => x.Value).Max();
+        }
+
         private PlayerId GetNextPlayer()
         {
-            var currentPlayerIndex = Players.IndexOf(Turn.CurrentPlayer);
+            var currentPlayerIndex = _players.IndexOf(_turn.CurrentPlayer);
             var nextPlayerIndex = currentPlayerIndex + 1;
 
-            return Players.ElementAtOrDefault(nextPlayerIndex);
+            return _players.ElementAtOrDefault(nextPlayerIndex);
         }
     }
 

@@ -5,7 +5,6 @@ using Akka.Actor;
 using Akka.Cluster.Tools.PublishSubscribe;
 using Akka.Persistence;
 using AkkaMjrTwo.Domain;
-using Newtonsoft.Json;
 
 namespace AkkaMjrTwo.GameEngine.Actor
 {
@@ -118,10 +117,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
                     PublishEvent(ev);
 
                     ev.Match()
-                      .With<GameStarted>(() =>
-                      {
-                          ScheduleCountdownTick();
-                      })
+                      .With<GameStarted>(ScheduleCountdownTick)
                       .With<TurnChanged>(() =>
                       {
                           CancelCountdownTick();
@@ -130,7 +126,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
                       .With<GameFinished>(() =>
                       {
                           CancelCountdownTick();
-                          Context.Stop(this.Self);
+                          Context.Stop(Self);
                       });
                 });
 
@@ -140,7 +136,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
         private void PublishEvent(GameEvent @event)
         {
             var mediator = DistributedPubSub.Get(Context.System).Mediator;
-            if (mediator == ActorRefs.Nobody)
+            if (mediator.Equals(ActorRefs.Nobody))
             {
                 Log.Error($"Unable to publish event { @event.GetType().Name }. Distributed pub/sub mediator not found.");
                 return;
@@ -151,7 +147,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
         private void ScheduleCountdownTick()
         {
             var cancelable = Context.System.Scheduler.ScheduleTellRepeatedlyCancelable(TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(1), this.Self, new TickCountdown(), ActorRefs.NoSender);
+                TimeSpan.FromSeconds(1), Self, new TickCountdown(), ActorRefs.NoSender);
 
             _cancelable.Add(cancelable);
         }

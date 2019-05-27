@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace AkkaMjrTwo.Domain
 {
@@ -21,7 +20,7 @@ namespace AkkaMjrTwo.Domain
         protected T ApplyEvents(params E[] args)
         {
             T result = null;
-            foreach (E arg in args)
+            foreach (var arg in args)
             {
                 result = ApplyEvent(arg);
             }

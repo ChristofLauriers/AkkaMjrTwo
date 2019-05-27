@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
 
-namespace GameEngine
+namespace AkkaMjrTwo.GameEngine
 {
     public class Program
     {

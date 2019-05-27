@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NLog;
 
-namespace AkkaMjrTwo.GameEngine.Api.Attributes
+namespace AkkaMjrTwo.GameEngine.Attributes
 {
     internal class RequestLoggingActionFilterAttribute : ActionFilterAttribute
     {

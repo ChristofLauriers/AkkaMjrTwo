@@ -83,7 +83,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
         private bool Handle(SendCommand command)
         {
             var game = Context.Child(command.GameId.Value);
-            if (game != ActorRefs.Nobody)
+            if (!game.Equals(ActorRefs.Nobody))
             {
                 game.Forward(command.Command);
             }

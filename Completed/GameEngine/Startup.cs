@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 
-namespace GameEngine
+namespace AkkaMjrTwo.GameEngine
 {
     public class Startup
     {
@@ -45,7 +45,7 @@ namespace GameEngine
             services.AddSingleton<GameManagerActorProvider>(provider =>
             {
                 var actorSystem = provider.GetService<ActorSystem>();
-                var gameManagerActor = actorSystem.ActorOf(Props.Create<GameManagerActor>());
+                var gameManagerActor = actorSystem.ActorOf(GameManagerActor.GetProps());
                 return () => gameManagerActor;
             });
 
