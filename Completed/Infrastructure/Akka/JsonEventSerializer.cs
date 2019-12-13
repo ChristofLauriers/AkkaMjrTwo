@@ -5,7 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace AkkaMjrTwo.Infrastructure
+namespace AkkaMjrTwo.Infrastructure.Akka
 {
     /// <summary>
     /// Serializer supports Weak Schema Versioning.

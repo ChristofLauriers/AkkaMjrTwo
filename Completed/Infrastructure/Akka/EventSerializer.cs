@@ -3,7 +3,7 @@ using System.Text;
 using Akka.Actor;
 using Akka.Serialization;
 
-namespace AkkaMjrTwo.Infrastructure
+namespace AkkaMjrTwo.Infrastructure.Akka
 {
     public class EventSerializer : Serializer
     {
