@@ -64,7 +64,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
 
         private bool Handle(CreateGame command)
         {
-            var id = new GameId(Guid.NewGuid().ToString());
+            var id = new GameId($"Game_{Guid.NewGuid().ToString()}");
 
             var gameActor = Context.Child(id.Value);
             if (!gameActor.Equals(ActorRefs.Nobody))
