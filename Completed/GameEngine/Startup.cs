@@ -12,10 +12,23 @@ namespace AkkaMjrTwo.GameEngine
 {
     public class Startup
     {
+        private const string GameEngineAllowSpecificOrigins = "_gameEngineSpecificOrigins";
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(GameEngineAllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyHeader()
+                               .AllowAnyMethod();
+                    });
+            });
 
             services.AddSwaggerGen(c =>
             {
@@ -43,6 +56,8 @@ namespace AkkaMjrTwo.GameEngine
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseCors(GameEngineAllowSpecificOrigins);
 
             app.UseEndpoints(endpoints =>
             {

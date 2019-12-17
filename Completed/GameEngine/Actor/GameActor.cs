@@ -109,28 +109,25 @@ namespace AkkaMjrTwo.GameEngine.Actor
 
         private void HandleChanges()
         {
-      
-                PersistAll(_game.UncommitedEvents, ev =>
-                {
-                    _game = _game.ApplyEvent(ev).MarkCommitted();
+            PersistAll(_game.UncommitedEvents, ev =>
+            {
+                _game = _game.ApplyEvent(ev).MarkCommitted();
 
-                    PublishEvent(ev);
+                PublishEvent(ev);
 
-                    ev.Match()
-                      .With<GameStarted>(ScheduleCountdownTick)
-                      .With<TurnChanged>(() =>
-                      {
-                          CancelCountdownTick();
-                          ScheduleCountdownTick();
-                      })
-                      .With<GameFinished>(() =>
-                      {
-                          CancelCountdownTick();
-                          Context.Stop(Self);
-                      });
-                });
-
-
+                ev.Match()
+                  .With<GameStarted>(ScheduleCountdownTick)
+                  .With<TurnChanged>(() =>
+                  {
+                      CancelCountdownTick();
+                      ScheduleCountdownTick();
+                  })
+                  .With<GameFinished>(() =>
+                  {
+                      CancelCountdownTick();
+                      Context.Stop(Self);
+                  });
+            });
         }
 
         private void PublishEvent(GameEvent @event)

@@ -24,7 +24,30 @@ namespace AkkaMjrTwo.UI.Hubs
 
         public async Task PublishEvent(string gameId, GameEvent @event)
         {
-            await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = @event });
+            if (@event is GameStarted started)
+            {
+                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = started });
+            }
+            if (@event is DiceRolled rolled)
+            {
+                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = rolled });
+            }
+            if (@event is TurnChanged turnChanged)
+            {
+                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = turnChanged });
+            }
+            if (@event is TurnCountdownUpdated turnCntDwnUpdated)
+            {
+                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = turnCntDwnUpdated });
+            }
+            if (@event is TurnTimedOut timeout)
+            {
+                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = timeout });
+            }
+            if (@event is GameFinished finished)
+            {
+                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = finished });
+            }
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

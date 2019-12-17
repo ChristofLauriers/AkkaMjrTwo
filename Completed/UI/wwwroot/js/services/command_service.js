@@ -6,7 +6,7 @@
     module.service('commandService', function($http) {
 
 
-        var baseUrl = "http://localhost:5001/api/";
+        var baseUrl = "http://localhost:7636/api/";
 
         return {
             createGame: function(success, error) {

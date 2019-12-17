@@ -16,10 +16,13 @@ namespace AkkaMjrTwo.Domain
     {
         public int RolledNumber { get; private set; }
 
-        public DiceRolled(GameId id, int rolledNumber)
+        public PlayerId Player { get; private set; }
+
+        public DiceRolled(GameId id, int rolledNumber, PlayerId player)
             : base(id)
         {
             RolledNumber = rolledNumber;
+            Player = player;
         }
     }
 

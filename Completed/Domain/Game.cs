@@ -1,7 +1,7 @@
-﻿using System;
+﻿using AkkaMjrTwo.Domain.Config;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using AkkaMjrTwo.Domain.Config;
 
 namespace AkkaMjrTwo.Domain
 {
@@ -45,7 +45,7 @@ namespace AkkaMjrTwo.Domain
         }
 
         public override Game MarkCommitted()
-        {   
+        {
             UncommitedEvents = new List<GameEvent>();
             return this;
         }
@@ -68,7 +68,7 @@ namespace AkkaMjrTwo.Domain
             }
 
             var firstPlayer = players.First();
-            ApplyEvents(new GameStarted(GameId, players, new Turn(firstPlayer, GlobalSettings.TurnTimeoutSeconds)));
+            ApplyEvent(new GameStarted(GameId, players, new Turn(firstPlayer, GlobalSettings.TurnTimeoutSeconds)));
             return this;
         }
 
@@ -109,7 +109,7 @@ namespace AkkaMjrTwo.Domain
             if (_turn.CurrentPlayer.Equals(player))
             {
                 var rolledNumber = _random.Next(1, 7);
-                var diceRolled = new DiceRolled(GameId, rolledNumber);
+                var diceRolled = new DiceRolled(GameId, rolledNumber, player);
 
                 var nextPlayer = GetNextPlayer();
                 if (nextPlayer != null)
@@ -127,7 +127,7 @@ namespace AkkaMjrTwo.Domain
                 return this;
             }
             else throw new NotCurrentPlayerViolation();
-        }     
+        }
 
         public Game TickCountDown()
         {
@@ -138,11 +138,11 @@ namespace AkkaMjrTwo.Domain
                 var nextPlayer = GetNextPlayer();
                 if (nextPlayer != null)
                 {
-                    ApplyEvents(countdownUpdated, timedOut, new TurnChanged(GameId, new Turn(nextPlayer, GlobalSettings.TurnTimeoutSeconds)));
+                    ApplyEvents(timedOut, new TurnChanged(GameId, new Turn(nextPlayer, GlobalSettings.TurnTimeoutSeconds)));
                 }
                 else
                 {
-                    ApplyEvents(countdownUpdated, timedOut, new GameFinished(GameId, BestPlayers()));
+                    ApplyEvents(timedOut, new GameFinished(GameId, BestPlayers()));
                 }
             }
             else
@@ -162,11 +162,11 @@ namespace AkkaMjrTwo.Domain
             }
             if (arg is DiceRolled diceRolled)
             {
-                if(!_rolledNumbers.Exists(x => x.Key.Equals(_turn.CurrentPlayer)))
+                if (!_rolledNumbers.Exists(x => x.Key.Equals(diceRolled.Player)))
                 {
-                    _rolledNumbers.Add(new KeyValuePair<PlayerId, int>(_turn.CurrentPlayer, diceRolled.RolledNumber));
+                    _rolledNumbers.Add(new KeyValuePair<PlayerId, int>(diceRolled.Player, diceRolled.RolledNumber));
                 }
-               
+
                 UncommitedEvents.Add(diceRolled);
             }
             if (arg is TurnCountdownUpdated turnCountdownUpdated)

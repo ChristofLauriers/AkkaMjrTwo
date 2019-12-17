@@ -39,7 +39,7 @@ namespace AkkaMjrTwo.UI.Actor
             });
 
             ReceiveAny(_ => Stash.Stash());
-        } 
+        }
 
         private void HubAvailable()
         {

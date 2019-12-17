@@ -13,7 +13,7 @@ namespace AkkaMjrTwo.UI
             var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
             try
             {
-                logger.Debug("Init Game Engine");
+                logger.Debug("Init Game UI");
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
