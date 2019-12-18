@@ -1,16 +1,19 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Akka.Actor;
+﻿using Akka.Actor;
 using AkkaMjrTwo.Domain;
 using AkkaMjrTwo.UI.Actor;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AkkaMjrTwo.UI.Hubs
 {
     public class EventHubHelper : IHostedService
     {
+        private const string Method = "broadcastEvent";
+
         private readonly IHubContext<EventHub> _hub;
         private readonly ILogger<EventHub> _logger;
         private readonly ActorSystem _actorSystem;
@@ -26,40 +29,48 @@ namespace AkkaMjrTwo.UI.Hubs
         {
             if (@event is GameStarted started)
             {
-                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = started });
+                await _hub.Clients.Group(gameId).SendAsync(Method, new { EventType = @event.GetType().Name, Event = started });
             }
             if (@event is DiceRolled rolled)
             {
-                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = rolled });
+                await _hub.Clients.Group(gameId).SendAsync(Method, new { EventType = @event.GetType().Name, Event = rolled });
             }
             if (@event is TurnChanged turnChanged)
             {
-                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = turnChanged });
+                await _hub.Clients.Group(gameId).SendAsync(Method, new { EventType = @event.GetType().Name, Event = turnChanged });
             }
             if (@event is TurnCountdownUpdated turnCntDwnUpdated)
             {
-                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = turnCntDwnUpdated });
+                await _hub.Clients.Group(gameId).SendAsync(Method, new { EventType = @event.GetType().Name, Event = turnCntDwnUpdated });
             }
             if (@event is TurnTimedOut timeout)
             {
-                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = timeout });
+                await _hub.Clients.Group(gameId).SendAsync(Method, new { EventType = @event.GetType().Name, Event = timeout });
             }
             if (@event is GameFinished finished)
             {
-                await _hub.Clients.Group(gameId).SendAsync("broadcastEvent", new { EventType = @event.GetType().Name, Event = finished });
+                await _hub.Clients.Group(gameId).SendAsync(Method, new { EventType = @event.GetType().Name, Event = finished });
             }
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            ICanTell subscriber = _actorSystem.ActorSelection("/user/EventSubscriber");
-            if (subscriber == ActorRefs.Nobody)
+            try
             {
-                _logger.LogError("EventSubscriberActor not found in ActorSystem.");
-            }
-            subscriber.Tell(new SetHub(this), ActorRefs.NoSender);
+                ICanTell subscriber = _actorSystem.ActorSelection("/user/UIEventSubscriber")
+                                                  .ResolveOne(TimeSpan.FromSeconds(5), cancellationToken)
+                                                  .Result;
 
-            return Task.CompletedTask;
+                subscriber.Tell(new SetHub(this), ActorRefs.NoSender);
+
+                return Task.CompletedTask;
+            }
+            catch (ActorNotFoundException ex)
+            {
+                _logger.LogError(ex, "UI EventSubscriberActor not found in ActorSystem.");
+
+                return Task.FromCanceled(cancellationToken);
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

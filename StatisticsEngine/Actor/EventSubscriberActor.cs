@@ -2,50 +2,18 @@
 using Akka.Actor;
 using Akka.Cluster.Tools.PublishSubscribe;
 using AkkaMjrTwo.Domain;
-using AkkaMjrTwo.UI.Hubs;
 
-namespace AkkaMjrTwo.UI.Actor
+namespace AkkaMjrTwo.StatisticsEngine.Actor
 {
-    public class SetHub : INoSerializationVerificationNeeded
-    {
-        public SetHub(EventHubHelper hub)
-        {
-            Hub = hub;
-        }
-        public EventHubHelper Hub { get; }
-    }
-
-
-
     public class EventSubscriberActor : ReceiveActor, IWithUnboundedStash
     {
         private const string TopicName = "game_event";
-
-        private EventHubHelper _hub;
 
         public IStash Stash { get; set; }
 
         public EventSubscriberActor()
         {
-            WaitingForHub();
-        }
-
-        private void WaitingForHub()
-        {
-            ReceiveAny(message =>
-            {
-                message.Match()
-                       .With<SetHub>(h =>
-                       {
-                           _hub = h.Hub;
-
-                           Become(InitializePubSub);
-                       })
-                       .Default(o =>
-                       {
-                           Stash.Stash();
-                       });
-            });
+            InitializePubSub();
         }
 
         private void InitializePubSub()
@@ -82,7 +50,7 @@ namespace AkkaMjrTwo.UI.Actor
         {
             ReceiveAsync<GameEvent>(async @event =>
             {
-                await _hub.PublishEvent(@event.Id.Value, @event);
+                //await _hub.PublishEvent(@event.Id.Value, @event);
             });
         }
     }

@@ -66,7 +66,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
                         HandleChanges();
                     }
                 })
-                .Default((o) =>
+                .Default(o =>
                 {
                     Context.System.Log.Warning("Game is not running, cannot update countdown");
                     CancelCountdownTick();

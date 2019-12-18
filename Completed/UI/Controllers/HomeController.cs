@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace UI.Controllers
+namespace AkkaMjrTwo.UI.Controllers
 {
     public class HomeController : Controller
     {

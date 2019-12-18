@@ -1,28 +1,28 @@
-﻿using Akka.Actor;
+using Akka.Actor;
 using AkkaMjrTwo.Infrastructure.Akka;
-using AkkaMjrTwo.UI.Actor;
-using AkkaMjrTwo.UI.Hubs;
+using AkkaMjrTwo.StatisticsEngine.Actor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Threading;
+using Microsoft.OpenApi.Models;
 
-namespace AkkaMjrTwo.UI
+namespace AkkaMjrTwo.StatisticsEngine
 {
     public class Startup
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllers();
 
-            services.AddSignalR();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "StatisticsEngine", Version = "v1" });
+            });
 
             // Register ActorSystem
             services.AddSingleton(_ => ConfigureActorSystem());
-
-            services.AddSingleton<EventHubHelper, EventHubHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -33,22 +33,21 @@ namespace AkkaMjrTwo.UI
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseStaticFiles();
-
             app.UseRouting();
 
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<EventHub>("/hub/event");
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
 
-            app.ApplicationServices.GetService<EventHubHelper>()
-                                   .StartAsync(CancellationToken.None);
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            });
 
             //ActorSystem lifetime management
             lifetime.ApplicationStarted.Register(() =>
@@ -65,7 +64,7 @@ namespace AkkaMjrTwo.UI
         {
             var actorSystem = ActorSystem.Create("DiceGameSystem", ConfigurationLoader.Load());
 
-            actorSystem.ActorOf(Props.Create<EventSubscriberActor>(), "UIEventSubscriber");
+            actorSystem.ActorOf(Props.Create<EventSubscriberActor>(), "StatisticsEventSubscriber");
 
             return actorSystem;
         }
