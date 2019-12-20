@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,5 +49,18 @@ namespace AkkaMjrTwo.StatisticsEngine.Actor
     public class ProjectionCoordinator: ReceiveActor, IWithUnboundedStash
     {
         public IStash Stash { get; set; }
+
+        private ConcurrentDictionary<Type, List<IActorRef>> _subscriptions;
+        private Guid _correlationId;
+        private IActorRef _projectRequestor;
+        private List<IActorRef> _subscribersForEvent;
+        private bool _projectionsOk;
+        private ICancelable _scheduler;
+
+
+        public ProjectionCoordinator()
+        {
+            
+        }
     }
 }
