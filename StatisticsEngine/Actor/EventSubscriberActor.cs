@@ -1,7 +1,9 @@
 ﻿using Akka;
 using Akka.Actor;
 using Akka.Cluster.Tools.PublishSubscribe;
+using Akka.Event;
 using AkkaMjrTwo.Domain;
+using AkkaMjrTwo.StatisticsEngine.Projectors;
 
 namespace AkkaMjrTwo.StatisticsEngine.Actor
 {
@@ -48,10 +50,50 @@ namespace AkkaMjrTwo.StatisticsEngine.Actor
 
         private void Initialized()
         {
-            ReceiveAsync<GameEvent>(async @event =>
+            Receive<GameEvent>(ProjectEvent);
+        }
+
+        private void ProjectEvent(GameEvent @event)
+        {
+            IActorRef projector = ActorRefs.Nobody;
+            @event.Match()
+                  .With<GameStarted>(_ =>
+                  {
+                      projector = GetProjectorActor(GameStartedProjectorActor.GetProps(), nameof(GameStartedProjectorActor));
+                  })
+                  .With<DiceRolled>(_ =>
+                  {
+                      projector = GetProjectorActor(DiceRolledProjectorActor.GetProps(), nameof(DiceRolledProjectorActor));
+                  })
+                  .With<GameFinished>(_ =>
+                  {
+                      projector = GetProjectorActor(GameFinishedProjectorActor.GetProps(), nameof(GameFinishedProjectorActor));
+                  })
+                  .Default(_ =>
+                  {
+                      Context.GetLogger().Info("Event {0} not projected. No projector for this event.", @event.GetType().Name);
+                  });
+
+            if (!projector.Equals(ActorRefs.Nobody))
             {
-                //await _hub.PublishEvent(@event.Id.Value, @event);
-            });
+                projector.Tell(@event);
+            }
+            else
+            {
+                Context.GetLogger().Warning("Unable to create or find child projector actor for event {0}", @event.GetType().Name);
+            }
+        }
+
+        private static IActorRef GetProjectorActor(Props props, string name)
+        {
+            //Find existing child actor
+            var projector = Context.Child(name);
+            if (projector.Equals(ActorRefs.Nobody))
+            {
+                //Create new child actor if not found
+                projector = Context.ActorOf(props, name);
+            }
+            return projector;
         }
     }
 }

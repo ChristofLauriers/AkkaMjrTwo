@@ -25,6 +25,26 @@ namespace AkkaMjrTwo.UI.Hubs
             _actorSystem = actorSystem;
         }
 
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                ICanTell subscriber = _actorSystem.ActorSelection("/user/UIEventSubscriber")
+                    .ResolveOne(TimeSpan.FromSeconds(5), cancellationToken)
+                    .Result;
+
+                subscriber.Tell(new SetHub(this), ActorRefs.NoSender);
+
+                return Task.CompletedTask;
+            }
+            catch (ActorNotFoundException ex)
+            {
+                _logger.LogError(ex, "UI EventSubscriberActor not found in ActorSystem.");
+
+                return Task.FromCanceled(cancellationToken);
+            }
+        }
+
         public async Task PublishEvent(string gameId, GameEvent @event)
         {
             if (@event is GameStarted started)
@@ -50,26 +70,6 @@ namespace AkkaMjrTwo.UI.Hubs
             if (@event is GameFinished finished)
             {
                 await _hub.Clients.Group(gameId).SendAsync(Method, new { EventType = @event.GetType().Name, Event = finished });
-            }
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            try
-            {
-                ICanTell subscriber = _actorSystem.ActorSelection("/user/UIEventSubscriber")
-                                                  .ResolveOne(TimeSpan.FromSeconds(5), cancellationToken)
-                                                  .Result;
-
-                subscriber.Tell(new SetHub(this), ActorRefs.NoSender);
-
-                return Task.CompletedTask;
-            }
-            catch (ActorNotFoundException ex)
-            {
-                _logger.LogError(ex, "UI EventSubscriberActor not found in ActorSystem.");
-
-                return Task.FromCanceled(cancellationToken);
             }
         }
 
