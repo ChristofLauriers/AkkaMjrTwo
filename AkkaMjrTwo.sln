@@ -3,7 +3,48 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.Domain", "Domain\AkkaMjrTwo.Domain.csproj", "{CD53CE97-DB63-4EF4-9D67-B1C1350BD11A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.GameEngine", "GameEngine\AkkaMjrTwo.GameEngine.csproj", "{B6DE19CF-BAD1-4295-AB24-72C696834567}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.Infrastructure", "Infrastructure\AkkaMjrTwo.Infrastructure.csproj", "{D9B9A9CF-BB6A-43A0-9F1C-A1725EC068B9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.UI", "UI\AkkaMjrTwo.UI.csproj", "{7AAFF6D5-230F-4644-ADBA-3D9F549E6B7A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.StatisticsEngine", "StatisticsEngine\AkkaMjrTwo.StatisticsEngine.csproj", "{36BE44B4-9792-4FC6-B792-BADC2936778C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DB", "DB", "{D2B6BDB2-C510-4D84-A5AA-797D1484D4B8}"
+	ProjectSection(SolutionItems) = preProject
+		DB\DB init.sql = DB\DB init.sql
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD53CE97-DB63-4EF4-9D67-B1C1350BD11A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD53CE97-DB63-4EF4-9D67-B1C1350BD11A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD53CE97-DB63-4EF4-9D67-B1C1350BD11A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD53CE97-DB63-4EF4-9D67-B1C1350BD11A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6DE19CF-BAD1-4295-AB24-72C696834567}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6DE19CF-BAD1-4295-AB24-72C696834567}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6DE19CF-BAD1-4295-AB24-72C696834567}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6DE19CF-BAD1-4295-AB24-72C696834567}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9B9A9CF-BB6A-43A0-9F1C-A1725EC068B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9B9A9CF-BB6A-43A0-9F1C-A1725EC068B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9B9A9CF-BB6A-43A0-9F1C-A1725EC068B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9B9A9CF-BB6A-43A0-9F1C-A1725EC068B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AAFF6D5-230F-4644-ADBA-3D9F549E6B7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AAFF6D5-230F-4644-ADBA-3D9F549E6B7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AAFF6D5-230F-4644-ADBA-3D9F549E6B7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AAFF6D5-230F-4644-ADBA-3D9F549E6B7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36BE44B4-9792-4FC6-B792-BADC2936778C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36BE44B4-9792-4FC6-B792-BADC2936778C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36BE44B4-9792-4FC6-B792-BADC2936778C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36BE44B4-9792-4FC6-B792-BADC2936778C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection

@@ -11,12 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.Infrastructure",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.GameEngine", "Completed\GameEngine\AkkaMjrTwo.GameEngine.csproj", "{404E0E57-0C83-4DED-8310-685DC9B4443F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.StatisticsEngine", "StatisticsEngine\AkkaMjrTwo.StatisticsEngine.csproj", "{D986727D-D57C-4B79-8F9F-6A7CAA57C026}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DB", "DB", "{78B01527-BF0E-4CF1-996E-F6BF90636B76}"
 	ProjectSection(SolutionItems) = preProject
 		Completed\DB\DB init.sql = Completed\DB\DB init.sql
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AkkaMjrTwo.StatisticsEngine", "Completed\StatisticsEngine\AkkaMjrTwo.StatisticsEngine.csproj", "{579A93FA-74E7-4CA3-B714-CB87F792237E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,10 +40,10 @@ Global
 		{404E0E57-0C83-4DED-8310-685DC9B4443F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{404E0E57-0C83-4DED-8310-685DC9B4443F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{404E0E57-0C83-4DED-8310-685DC9B4443F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D986727D-D57C-4B79-8F9F-6A7CAA57C026}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D986727D-D57C-4B79-8F9F-6A7CAA57C026}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D986727D-D57C-4B79-8F9F-6A7CAA57C026}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D986727D-D57C-4B79-8F9F-6A7CAA57C026}.Release|Any CPU.Build.0 = Release|Any CPU
+		{579A93FA-74E7-4CA3-B714-CB87F792237E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{579A93FA-74E7-4CA3-B714-CB87F792237E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{579A93FA-74E7-4CA3-B714-CB87F792237E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{579A93FA-74E7-4CA3-B714-CB87F792237E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
