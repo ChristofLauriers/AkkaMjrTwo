@@ -7,7 +7,7 @@ namespace AkkaMjrTwo.StatisticsEngine.ReadModels
         public DbSet<GameStatistic> Statistics { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlServer("StatisticsDatabase");
+            => options.UseSqlServer("Data Source=localhost;Initial Catalog=GameStatistics;Integrated Security=True;");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

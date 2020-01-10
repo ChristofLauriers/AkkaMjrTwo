@@ -1,6 +1,7 @@
 using Akka.Actor;
 using AkkaMjrTwo.Infrastructure.Akka;
 using AkkaMjrTwo.StatisticsEngine.Actor;
+using AkkaMjrTwo.StatisticsEngine.ReadModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,6 +49,12 @@ namespace AkkaMjrTwo.StatisticsEngine
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
                 c.RoutePrefix = string.Empty;
             });
+
+            //Create readmodel database
+            using (var db = new GameStatisticsContext())
+            {
+                db.Database.EnsureCreated();
+            }
 
             //ActorSystem lifetime management
             lifetime.ApplicationStarted.Register(() =>
