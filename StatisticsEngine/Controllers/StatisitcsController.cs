@@ -13,13 +13,25 @@ namespace AkkaMjrTwo.StatisticsEngine.Controllers
     {
 
         [RequestLoggingActionFilter]
-        [Route("view")]
+        [Route("game")]
         [HttpGet]
         public async Task<ActionResult> Create(string gameId)
         {
             using (var db = new GameStatisticsContext())
             {
                 var statistics = await db.Statistics.Where(s => s.GameId.Equals(gameId)).ToListAsync();
+                return Ok(statistics);
+            }
+        }
+
+        [RequestLoggingActionFilter]
+        [Route("all")]
+        [HttpGet]
+        public async Task<ActionResult> Create()
+        {
+            using (var db = new GameStatisticsContext())
+            {
+                var statistics = await db.Statistics.ToListAsync();
                 return Ok(statistics);
             }
         }
