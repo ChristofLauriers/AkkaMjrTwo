@@ -4,6 +4,8 @@ using AkkaMjrTwo.Domain;
 
 namespace AkkaMjrTwo.GameEngine.Actor
 {
+    #region Commands
+
     public class Command
     { }
 
@@ -26,7 +28,9 @@ namespace AkkaMjrTwo.GameEngine.Actor
         }
     }
 
+    #endregion
 
+    #region Messages
 
     public class GameCreated
     {
@@ -47,50 +51,41 @@ namespace AkkaMjrTwo.GameEngine.Actor
     public class GameAlreadyExists
     { }
 
+    #endregion
 
-
-    public class GameManagerActor : ReceiveActor
+    //Transform GameManagerActor class into an actor
+    public class GameManagerActor
     {
         public GameManagerActor()
         {
-            Receive<CreateGame>(Handle);
-            Receive<SendCommand>(Handle);
+            //Register handlers for:
+            //  - CreateGame
+            //  - SendCommand
         }
 
-        public static Props GetProps()
-        {
-            return Props.Create<GameManagerActor>();
-        }
+        //Add Factory method (GetProps)
 
         private bool Handle(CreateGame command)
         {
             var id = new GameId($"Game_{Guid.NewGuid().ToString()}");
 
-            var gameActor = Context.Child(id.Value);
-            if (!gameActor.Equals(ActorRefs.Nobody))
-            {
-                Sender.Tell(new GameAlreadyExists());
-                return true;
-            }
-
-            Context.ActorOf(GameActor.GetProps(id), id.Value);
-
-            Sender.Tell(new GameCreated(id));
+            //Retrieve child GameActor and check if it already exists.
+            //If GameActor already exists:
+            //  - Respond with GameAlreadyExists message
+            //If GameActor does not exist:
+            //  - Create new GameActor as a child
+            //  - Respond with GameCreated message
 
             return true;
         }
 
         private bool Handle(SendCommand command)
         {
-            var game = Context.Child(command.GameId.Value);
-            if (!game.Equals(ActorRefs.Nobody))
-            {
-                game.Forward(command.Command);
-            }
-            else
-            {
-                Sender.Tell(new GameDoesNotExist());
-            }
+            //Retrieve child GameActor and check if it already exists.
+            //If GameActor exists:
+            //  - Forward the command
+            //If GameActor does not exist:
+            //  - Respond with GameDoesNotExist message
 
             return true;
         }

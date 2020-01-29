@@ -8,6 +8,8 @@ using AkkaMjrTwo.Domain;
 
 namespace AkkaMjrTwo.GameEngine.Actor
 {
+    #region Messages
+
     public abstract class CommandResult
     { }
 
@@ -26,18 +28,17 @@ namespace AkkaMjrTwo.GameEngine.Actor
         {
             Violation = violation;
         }
-    }
+    } 
 
+    #endregion
 
-
-    public class GameActor : PersistentActor
+    //Transform GameActor class into a persistent actor
+    public class GameActor
     {
         private Game _game;
 
         private readonly GameId _id;
         private readonly List<ICancelable> _cancelable;
-
-        public override string PersistenceId => _id.Value;
 
         public GameActor(GameId id)
         {
@@ -46,50 +47,11 @@ namespace AkkaMjrTwo.GameEngine.Actor
             _cancelable = new List<ICancelable>();
         }
 
-        public static Props GetProps(GameId id)
-        {
-            return Props.Create(() => new GameActor(id));
-        }
+        //Add Factory method (GetProps)
 
-        protected override bool ReceiveCommand(object message)
-        {
-            return message.Match()
-                .With<GameCommand>(cmd =>
-                {
-                    HandleResult(_game.HandleCommand, cmd);
-                })
-                .With<TickCountdown>(() =>
-                {
-                    if (_game is RunningGame game)
-                    {
-                        _game = game.TickCountDown();
-                        HandleChanges();
-                    }
-                })
-                .Default(o =>
-                {
-                    Context.System.Log.Warning("Game is not running, cannot update countdown");
-                    CancelCountdownTick();
-                })
-                .WasHandled;
-        }
+        //Implement ReceiveCommand.
 
-        protected override bool ReceiveRecover(object message)
-        {
-            return message.Match()
-                .With<GameEvent>((ev) =>
-                {
-                    _game = _game.ApplyEvent(ev);
-                })
-                .With<RecoveryCompleted>(() =>
-                {
-                    if (_game.IsRunning)
-                    {
-                        ScheduleCountdownTick();
-                    }
-                })
-                .WasHandled;
-        }
+        //Implement ReceiveRecover
 
         private void HandleResult(Func<GameCommand, Game> commandHandler, GameCommand command)
         {
@@ -97,41 +59,31 @@ namespace AkkaMjrTwo.GameEngine.Actor
             {
                 _game = commandHandler.Invoke(command);
 
-                Sender.Tell(new CommandAccepted());
+                //Reply to the caller that command is accepted
 
                 HandleChanges();
             }
             catch (GameRuleViolation violation)
             {
-                Sender.Tell(new CommandRejected(violation));
+                //Reply to the caller that command is rejected
             }
         }
 
         private void HandleChanges()
         {
-            PersistAll(_game.UncommitedEvents, ev =>
-            {
-                _game = _game.ApplyEvent(ev).MarkCommitted();
-
-                PublishEvent(ev);
-
-                ev.Match()
-                  .With<GameStarted>(ScheduleCountdownTick)
-                  .With<TurnChanged>(() =>
-                  {
-                      CancelCountdownTick();
-                      ScheduleCountdownTick();
-                  })
-                  .With<GameFinished>(() =>
-                  {
-                      CancelCountdownTick();
-                      Context.Stop(Self);
-                  });
-            });
+            //Steps:
+            //- Persist all uncommitted events (tip: Use base class method)
+            //- Apply events to game and mark the event committed
+            //- publish the event
+            //- Manage the countdown ticker
+            //  1 event GameStarted -> schedule the countdown ticker
+            //  2 event TurnChanged -> Cancel the countdown tick and schedule a new one
+            //  3 event GameFinished -> Cancel the coundown tick and stop the actor
         }
 
         private void PublishEvent(GameEvent @event)
         {
+            // Using Akka DistributedPubSub to publish the event
             var mediator = DistributedPubSub.Get(Context.System).Mediator;
             if (mediator.Equals(ActorRefs.Nobody))
             {
@@ -143,6 +95,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
 
         private void ScheduleCountdownTick()
         {
+            // Using Akka Scheduler as CountDownTicker. 
             var cancelable = Context.System.Scheduler.ScheduleTellRepeatedlyCancelable(TimeSpan.FromSeconds(1),
                 TimeSpan.FromSeconds(1), Self, new TickCountdown(), ActorRefs.NoSender);
 

@@ -26,8 +26,9 @@ namespace AkkaMjrTwo.GameEngine.Controllers
         [HttpPost]
         public async Task<ActionResult> Create()
         {
-            var feedback = await _gameManagerActor.Ask<GameCreated>(new CreateGame());
-            return Ok(feedback);
+            //- Send a GameCreated message to the GameManagerActor
+            //- Return feedback
+            return Ok();
         }
 
         [RequestLoggingActionFilter]
@@ -41,9 +42,8 @@ namespace AkkaMjrTwo.GameEngine.Controllers
                 playerIds.Add(new PlayerId(str));
             }
 
-            var msg = new SendCommand(new GameId(request.GameId), new StartGame(playerIds));
-
-            var feedback = await _gameManagerActor.Ask<object>(msg);
+            //Send a SendCommand command containing a StartGame GameCommand to the GameManagerActor
+            
             return Ok(new { Result = feedback.GetType().Name });
         }
 
@@ -52,9 +52,8 @@ namespace AkkaMjrTwo.GameEngine.Controllers
         [HttpPost]
         public async Task<ActionResult> Roll(RollDiceRequest request)
         {
-            var msg = new SendCommand(new GameId(request.GameId), new RollDice(new PlayerId(request.PlayerId)));
+            //Send a SendCommand command containing a RollDice GameCommand to the GameManagerActor
 
-            var feedback = await _gameManagerActor.Ask<object>(msg);
             return Ok(new { Result = feedback.GetType().Name });
         }
     }
