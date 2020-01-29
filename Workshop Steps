@@ -1,0 +1,56 @@
+GameEngine
+- GameActor
+	- Inherit PersistentActor
+	- Add persistence id (override)
+	- Add Factory method (GetProps)
+	- Add ReceiveCommand (override)
+		- use Akka Pattern Match extension
+	- Add ReceiveRecover (override)
+		- use Akka Pattern Match extension
+	- HandleResult
+		- Reply command accepted
+		- Reply command rejected
+	- HandleChanges
+		- Persist all uncommitted events
+		- Apply events to game and mark the event committed
+		- publish the event
+		- Manage the countdown ticker
+			- event GameStarted -> schedule the countdown ticker
+			- event TurnChanged -> Cancel the countdown tick and schedule a new one
+			- event GameFinished -> Cancel the coundown tick and stop the actor
+			
+- GameManagerActor
+	- Inherit ReceiveActor
+	- Register handlers for
+		- CreateGame
+		- SendCommand
+	- Add Factory method (GetProps)
+	- CreateGame handler
+		- Retrieve child GameActor and check if it already exists.
+        - If GameActor already exists:
+			- Respond with GameAlreadyExists message
+        - If GameActor does not exist:
+			- Create new GameActor as a child
+            - Respond with GameCreated message
+	- SendCommand handler
+		- Retrieve child GameActor and check if it already exists.
+		- If GameActor exists:
+			- Forward the command
+        - If GameActor does not exist:
+            - Respond with GameDoesNotExist message
+
+- GameController
+	- Create endpoint
+		- Send a GameCreated message to the GameManagerActor
+		- Return feedback
+	- Start endpoint
+		- Send a SendCommand command containing a StartGame GameCommand to the GameManagerActor
+	- Roll endpoint
+		- Send a SendCommand command containing a RollDice GameCommand to the GameManagerActor
+		
+- Startup
+	- ConfigureActorSystem method
+		- Create the ActorSystem with name "DiceGameSystem" (tip: use ConfigurationLoader to bootstap Akka configuration)
+
+	
+	

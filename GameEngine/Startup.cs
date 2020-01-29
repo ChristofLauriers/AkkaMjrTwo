@@ -85,7 +85,7 @@ namespace AkkaMjrTwo.GameEngine
 
         private static ActorSystem ConfigureActorSystem()
         {
-            return ActorSystem.Create("DiceGameSystem", ConfigurationLoader.Load());
+            //Create the ActorSystem with name "DiceGameSystem" (tip: use ConfigurationLoader to bootstap Akka configuration)
         }
     }
 }
