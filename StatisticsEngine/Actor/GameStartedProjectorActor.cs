@@ -4,39 +4,24 @@ using AkkaMjrTwo.StatisticsEngine.ReadModels;
 
 namespace AkkaMjrTwo.StatisticsEngine.Projectors
 {
-    public class GameStartedProjectorActor : ReceiveActor
+    //Transform GameStartedProjectorActor class into an actor
+    public class GameStartedProjectorActor
     {
         public GameStartedProjectorActor()
         {
             Initialize();
         }
 
-        public static Props GetProps()
-        {
-            return Props.Create<GameStartedProjectorActor>();
-        }
+        //Add Factory method (GetProps)
 
         private void Initialize()
         {
-            Receive<GameStarted>(Project);
+            //Register Project message handler
         }
 
         private static void Project(GameStarted @event)
         {
-            var gameId = @event.Id.Value;
-
-            using (var db = new GameStatisticsContext())
-            {
-                foreach (var player in @event.Players)
-                {
-                    db.Add(new GameStatistic
-                    {
-                        GameId = gameId,
-                        PlayerId = player.Value
-                    });
-                }
-                db.SaveChanges();
-            }
+            //Create new statistics projection records for each player using GameStatisticsContext
         }
     }
 }

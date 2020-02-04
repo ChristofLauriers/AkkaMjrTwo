@@ -18,7 +18,7 @@
                      });
             },
             startGame: function(gameId, playersCount, error) {
-                var players = []
+                var players = [];
                 for (var i = 0; i < playersCount; i++) { 
                     players[i] = 'player ' + (i + 1);
                 }

@@ -6,41 +6,24 @@ using AkkaMjrTwo.StatisticsEngine.ReadModels;
 
 namespace AkkaMjrTwo.StatisticsEngine.Projectors
 {
-    public class DiceRolledProjectorActor : ReceiveActor
+    //Transform DiceRolledProjectorActor class into an actor
+    public class DiceRolledProjectorActor
     {
         public DiceRolledProjectorActor()
         {
             Initialize();
         }
 
-        public static Props GetProps()
-        {
-            return Props.Create<DiceRolledProjectorActor>();
-        }
+        //Add Factory method (GetProps)
 
         private void Initialize()
         {
-            Receive<DiceRolled>(Project);
+            //Register Project message handler
         }
 
         private static void Project(DiceRolled @event)
         {
-            var gameId = @event.Id.Value;
-            var player = @event.Player.Value;
-
-            using (var db = new GameStatisticsContext())
-            {
-                var statistic = db.Statistics.FirstOrDefault(s => s.GameId.Equals(gameId) && s.PlayerId.Equals(player));
-                if (statistic != null)
-                {
-                    statistic.NumberRolled = @event.RolledNumber;
-                    db.SaveChanges();
-                }
-                else
-                {
-                    Context.GetLogger().Warning("Unable to find GameStatistic readmodel for game id {0} and player id {1}", gameId, player);
-                }
-            }
+            //Update NumberRolled in statistics projection record for current player using GameStatisticsContext
         }
     }
 }

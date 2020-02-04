@@ -6,43 +6,24 @@ using System.Linq;
 
 namespace AkkaMjrTwo.StatisticsEngine.Projectors
 {
-    public class GameFinishedProjectorActor : ReceiveActor
+    //Transform GameFinishedProjectorActor class into an actor
+    public class GameFinishedProjectorActor
     {
         public GameFinishedProjectorActor()
         {
             Initialize();
         }
 
-        public static Props GetProps()
-        {
-            return Props.Create<GameFinishedProjectorActor>();
-        }
+        //Add Factory method (GetProps)
 
         private void Initialize()
         {
-            Receive<GameFinished>(Project);
+            //Register Project message handler
         }
 
         private static void Project(GameFinished @event)
         {
-            var gameId = @event.Id.Value;
-
-            using (var db = new GameStatisticsContext())
-            {
-                foreach (var player in @event.Winners)
-                {
-                    var statistic = db.Statistics.FirstOrDefault(s => s.GameId.Equals(gameId) && s.PlayerId.Equals(player.Value));
-                    if (statistic != null)
-                    {
-                        statistic.Winner = true;
-                    }
-                    else
-                    {
-                        Context.GetLogger().Warning("Unable to find GameStatistic readmodel for game id {0} and player id {1}", gameId, player);
-                    }
-                }
-                db.SaveChanges();
-            }
+            //Flag winners in statistics projection records using GameStatisticsContext
         }
     }
 }
