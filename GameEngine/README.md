@@ -18,13 +18,11 @@ Those commands are handled by Akka.NET actors (see Actor Hierarchy).
   <img src="https://github.com/ChristofLauriers/AkkaMjrTwo/blob/master/GameEngine/ActorHierarchy.png">
 </p>
 
-## Game Engine Flow
+## Game Engine Details
 
 <p align="center">
   <img src="https://github.com/ChristofLauriers/AkkaMjrTwo/blob/master/GameEngine/Game%20Engine%20Flow.png">
 </p>
-
-## Game Engine Timer
 
 <p align="center">
   <img src="https://github.com/ChristofLauriers/AkkaMjrTwo/blob/master/GameEngine/Game%20Engine%20Timer.png">
