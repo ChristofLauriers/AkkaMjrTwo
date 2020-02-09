@@ -47,7 +47,6 @@ _This actor is the heart of the game. It is responsible for the following things
 * _Handle the turn timer._
 <br/>
 <br/>
-
 1. Transform this class into a PersistentActor.
 
 2. Add a factory method necessary to create this actor.
