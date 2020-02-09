@@ -8,6 +8,8 @@ whenever a specific type of event comes in. These methods perform CRUD operation
 For the convenience, we will be grouping all event handlers into projector classes based on the read model that they 
 are working with.
 
+We'll be using Entity Framework Core and SQL Server as our persistence layer.
+
 ## Architecture
 
 <p align="center">

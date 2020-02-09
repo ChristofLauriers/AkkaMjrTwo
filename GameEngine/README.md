@@ -3,7 +3,7 @@
 This project contains the game engine of the dice game
 and handles all game commands & messages. This is the heart of the game.
 It represents the write side of the CQRS pattern. 
-This project uses Akka.NET Persistence as event sourcing provider.
+This project uses Akka.NET Persistence as event sourcing provider and SQL Server as event store.
 
 ## Architecture
 
@@ -37,6 +37,9 @@ These steps describe the actions to complete the code and make the game work. Co
 It's a given that you try to figure out how to complete te code yourself before taking a look at the completed examples  :)
 
 _**General rule:** Try to use Akka Pattern Match if you need to conditionally check messages. (See Akka cheat sheet)_
+
+### Database
+Execute the [DB init.sql][2] script to create the event store database and schema.
 
 ### Startup class
 Create a new actor system named DiceGameSystem. Use the ConfigureActorSystem method.
@@ -114,4 +117,5 @@ You'll need to implement the following endpoints:
 3. Roll, used to issue a roll dice command.
     * Send a SendCommand message containing a RollDice command to the GameManagerActor.	
 
-[1]: https://getakka.net/articles/concepts/supervision.html "Akka.NET Supervision"		
+[1]: https://getakka.net/articles/concepts/supervision.html "Akka.NET Supervision"	
+[2]: https://github.com/ChristofLauriers/AkkaMjrTwo/blob/master/DB/DB%20init.sql "Initial Database Script"	
