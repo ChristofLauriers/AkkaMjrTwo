@@ -42,9 +42,9 @@ _**General rule:** Try to use Akka Pattern Match if you need to conditionally ch
 Create a new actor system named DiceGameSystem. Use the ConfigureActorSystem method.
 
 ### GameActor class
-_This actor is the heart of the game. It is responsible for the following things_
-* _Handle game commands and apply the resulting events to the domain._
-* _Handle the turn timer._
+_This actor is the heart of the game. It is responsible for handling game commands, applying the resulting events to the domain and managing the turn timer._
+<br/>
+<br/>
 1. Transform this class into a PersistentActor.
 
 2. Add a factory method necessary to create this actor.
