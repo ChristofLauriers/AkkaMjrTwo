@@ -1,20 +1,17 @@
-﻿using System;
-using Akka.Actor;
+﻿using Akka.Actor;
 using AkkaMjrTwo.Domain;
+using System;
 
 namespace AkkaMjrTwo.GameEngine.Actor
 {
-    public class Command
+    #region Messages
+
+    public class CreateGame
     { }
 
 
 
-    public class CreateGame : Command
-    { }
-
-
-
-    public class SendCommand : Command
+    public class SendCommand
     {
         public GameId GameId { get; private set; }
         public GameCommand Command { get; private set; }
@@ -25,7 +22,6 @@ namespace AkkaMjrTwo.GameEngine.Actor
             Command = command;
         }
     }
-
 
 
     public class GameCreated
@@ -39,7 +35,6 @@ namespace AkkaMjrTwo.GameEngine.Actor
     }
 
 
-
     public class GameDoesNotExist
     { }
 
@@ -47,8 +42,8 @@ namespace AkkaMjrTwo.GameEngine.Actor
     public class GameAlreadyExists
     { }
 
-
-
+    #endregion
+       
     public class GameManagerActor : ReceiveActor
     {
         public GameManagerActor()
@@ -62,7 +57,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
             return Props.Create<GameManagerActor>();
         }
 
-        private bool Handle(CreateGame command)
+        private bool Handle(CreateGame message)
         {
             var id = new GameId($"Game_{Guid.NewGuid().ToString()}");
 
@@ -80,12 +75,12 @@ namespace AkkaMjrTwo.GameEngine.Actor
             return true;
         }
 
-        private bool Handle(SendCommand command)
+        private bool Handle(SendCommand message)
         {
-            var game = Context.Child(command.GameId.Value);
+            var game = Context.Child(message.GameId.Value);
             if (!game.Equals(ActorRefs.Nobody))
             {
-                game.Forward(command.Command);
+                game.Forward(message.Command);
             }
             else
             {

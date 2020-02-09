@@ -4,19 +4,14 @@ using AkkaMjrTwo.Domain;
 
 namespace AkkaMjrTwo.GameEngine.Actor
 {
-    #region Commands
+    #region Messages
 
-    public class Command
+    public class CreateGame
     { }
 
 
 
-    public class CreateGame : Command
-    { }
-
-
-
-    public class SendCommand : Command
+    public class SendCommand
     {
         public GameId GameId { get; private set; }
         public GameCommand Command { get; private set; }
@@ -27,10 +22,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
             Command = command;
         }
     }
-
-    #endregion
-
-    #region Messages
+    
 
     public class GameCreated
     {
@@ -41,7 +33,6 @@ namespace AkkaMjrTwo.GameEngine.Actor
             GameId = gameId;
         }
     }
-
 
 
     public class GameDoesNotExist
@@ -59,13 +50,13 @@ namespace AkkaMjrTwo.GameEngine.Actor
         public GameManagerActor()
         {
             //Register handlers for:
-            //  - CreateGame
-            //  - SendCommand
+            //  - CreateGame messages
+            //  - SendCommand messages
         }
 
         //Add Factory method (GetProps)
 
-        private bool Handle(CreateGame command)
+        private bool Handle(CreateGame message)
         {
             var id = new GameId($"Game_{Guid.NewGuid().ToString()}");
 
@@ -79,7 +70,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
             return true;
         }
 
-        private bool Handle(SendCommand command)
+        private bool Handle(SendCommand message)
         {
             //Retrieve child GameActor and check if it already exists.
             //If GameActor exists:
