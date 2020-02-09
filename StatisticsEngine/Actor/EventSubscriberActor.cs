@@ -55,25 +55,8 @@ namespace AkkaMjrTwo.StatisticsEngine.Actor
 
         private void ProjectEvent(GameEvent @event)
         {
-            IActorRef projector = ActorRefs.Nobody;
-            @event.Match()
-                  .With<GameStarted>(_ =>
-                  {
-                      projector = GetProjectorActor(GameStartedProjectorActor.GetProps(), nameof(GameStartedProjectorActor));
-                  })
-                  .With<DiceRolled>(_ =>
-                  {
-                      projector = GetProjectorActor(DiceRolledProjectorActor.GetProps(), nameof(DiceRolledProjectorActor));
-                  })
-                  .With<GameFinished>(_ =>
-                  {
-                      projector = GetProjectorActor(GameFinishedProjectorActor.GetProps(), nameof(GameFinishedProjectorActor));
-                  })
-                  .Default(_ =>
-                  {
-                      Context.GetLogger().Info("Event {0} not projected. No projector for this event.", @event.GetType().Name);
-                  });
-
+            IActorRef projector = GetProjectorActor(StatisticsProjectorActor.GetProps(), nameof(StatisticsProjectorActor));
+            
             if (!projector.Equals(ActorRefs.Nobody))
             {
                 projector.Tell(@event);
