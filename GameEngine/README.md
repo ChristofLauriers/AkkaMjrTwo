@@ -45,8 +45,6 @@ Create a new actor system named DiceGameSystem. Use the ConfigureActorSystem met
 _This actor is the heart of the game. It is responsible for the following things_
 * _Handle game commands and apply the resulting events to the domain._
 * _Handle the turn timer._
-<br/>
-<br/>
 1. Transform this class into a PersistentActor.
 
 2. Add a factory method necessary to create this actor.
