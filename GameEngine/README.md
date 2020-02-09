@@ -112,10 +112,6 @@ You'll need to implement the following endpoints:
 	* Send a SendCommand message containing a StartGame command to the GameManagerActor.
 
 3. Roll, used to issue a roll dice command.
-    * Send a SendCommand message containing a RollDice command to the GameManagerActor.
-		
-- Startup
-	- ConfigureActorSystem method
-		- Create the ActorSystem with name "DiceGameSystem" (tip: use ConfigurationLoader to bootstap Akka configuration)
+    * Send a SendCommand message containing a RollDice command to the GameManagerActor.	
 
 [1]: https://getakka.net/articles/concepts/supervision.html "Akka.NET Supervision"		
