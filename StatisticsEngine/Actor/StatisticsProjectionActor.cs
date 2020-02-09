@@ -23,17 +23,17 @@ namespace AkkaMjrTwo.StatisticsEngine.Projectors
 
         private static void Project(GameStarted @event)
         {
-            //Create new statistics projection records for each player using GameStatisticsContext
+            //Create new statistics read model for each player using GameStatisticsContext
         }
 
         private static void Project(DiceRolled @event)
         {
-            //Update NumberRolled in statistics projection record for current player using GameStatisticsContext
+            //Update NumberRolled in statistics read model for current player using GameStatisticsContext
         }
 
         private static void Project(GameFinished @event)
         {
-            //Flag winners in statistics projection records using GameStatisticsContext
+            //Flag winners in statistics read model using GameStatisticsContext
         }
     }
 }
