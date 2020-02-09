@@ -55,7 +55,7 @@ namespace AkkaMjrTwo.StatisticsEngine.Actor
 
         private void ProjectEvent(GameEvent @event)
         {
-            IActorRef projector = GetProjectorActor(StatisticsProjectorActor.GetProps(), nameof(StatisticsProjectorActor));
+            IActorRef projector = GetProjectorActor(StatisticsProjectionActor.GetProps(), nameof(StatisticsProjectionActor));
             
             if (!projector.Equals(ActorRefs.Nobody))
             {

@@ -6,16 +6,16 @@ using AkkaMjrTwo.StatisticsEngine.ReadModels;
 
 namespace AkkaMjrTwo.StatisticsEngine.Projectors
 {
-    public class StatisticsProjectorActor : ReceiveActor
+    public class StatisticsProjectionActor : ReceiveActor
     {
-        public StatisticsProjectorActor()
+        public StatisticsProjectionActor()
         {
             Initialize();
         }
 
         public static Props GetProps()
         {
-            return Props.Create<StatisticsProjectorActor>();
+            return Props.Create<StatisticsProjectionActor>();
         }
 
         private void Initialize()

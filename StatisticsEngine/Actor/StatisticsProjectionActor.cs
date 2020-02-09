@@ -7,9 +7,9 @@ using AkkaMjrTwo.StatisticsEngine.ReadModels;
 namespace AkkaMjrTwo.StatisticsEngine.Projectors
 {
     //Transform StatisticsProjectorActor class into an actor
-    public class StatisticsProjectorActor
+    public class StatisticsProjectionActor
     {
-        public StatisticsProjectorActor()
+        public StatisticsProjectionActor()
         {
             Initialize();
         }
