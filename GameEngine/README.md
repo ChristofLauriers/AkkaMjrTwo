@@ -94,22 +94,23 @@ _This actor is the heart of the game. It is responsible for handling game comman
 2. Add a factory method necessary to create this actor.
 
 3. Create a method to handle incoming messages by implementing ReceiveCommand. 
-This method has to react to GameCommands as well as TickCountdown messages.
-	* Delegate GameCommand execution to the domain using the existing HandleResult method.
+This method has to react to GameCommands as well as TickCountdown messages (tip: use pattern match to differentiate between event types)
+    * Delegate GameCommand execution to the domain using the existing HandleResult method.
     * Apply a tick countdown on the domain and persist the message using the HandleChanges method. 
     (Only apply on a running game)
+    * Unkown message? Log using Akka and stop the countdown ticker.
 
 4. Create a method to handle recovery (state re-build) by implement ReceiveRecover. This handler must
 not have side-effects other than changing persistent actor state i.e. it should
-not perform actions that may fail, such as interacting with external services, for example.
-	* Apply all GameEvents on the domain.
+not perform actions that may fail, such as interacting with external services.
+    * Apply all GameEvents on the domain.
     * Schedule a countdown tick if recovery is completed to continue the game in it's current state.
 
 5. Complete HandleResult method by replying command execution result to the sender.
 
 6. Complete HandleChanges method. This method will make sure all uncommitted events in the domain are persisted. 
 The following actions need to happen after the events are persisted:
-	* re-apply the events to make sure the domain is in the correct persisted state. 
+    * re-apply the events to make sure the domain is in the correct persisted state. 
     * Mark events commited.
     * Publish the event using the PublishEvent method.
     * Countdown ticker management
