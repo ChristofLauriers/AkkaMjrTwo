@@ -44,38 +44,22 @@ Execute the [DB init.sql][2] script to create the event store database and schem
 ### Startup class
 Create a new actor system named DiceGameSystem. Use the ConfigureActorSystem method.
 
-### GameActor class
-_This actor is the heart of the game. It is responsible for handling game commands, applying the resulting events to the domain and managing the turn timer._
+### GameController class
+_This class is used to create the REST api for the game engine. The REST api is the door into the game engine. It is used to
+issue commands from the user interface into the game._
 <br/>
 <br/>
-1. Transform this class into a PersistentActor.
+You'll need to implement the following endpoints:
+1. Create, used to create a new game.
+	* Send a CreateGame message to the GameManagerActor.
+    * Return feedback. 
 
-2. Add a factory method necessary to create this actor.
+2. Start, used to start an uninitialized game.
+	* Send a SendCommand message containing a StartGame command to the GameManagerActor.
 
-3. Create a method to handle incoming messages by implementing ReceiveCommand. 
-This method has to react to GameCommands as well as TickCountdown messages.
-	* Delegate GameCommand execution to the domain using the existing HandleResult method.
-    * Apply a tick countdown on the domain and persist the message using the HandleChanges method. 
-    (Only apply on a running game)
-
-4. Create a method to handle recovery (state re-build) by implement ReceiveRecover. This handler must
-not have side-effects other than changing persistent actor state i.e. it should
-not perform actions that may fail, such as interacting with external services, for example.
-	* Apply all GameEvents on the domain.
-    * Schedule a countdown tick if recovery is completed to continue the game in it's current state.
-
-5. Complete HandleResult method by replying command execution result to the sender.
-
-6. Complete HandleChanges method. This method will make sure all uncommitted events in the domain are persisted. 
-The following actions need to happen after the events are persisted:
-	* re-apply the events to make sure the domain is in the correct persisted state. 
-    * Mark events commited.
-    * Publish the event using the PublishEvent method.
-    * Countdown ticker management
-      * Schedule a new countdown ticker if the event was a GameStarted event.
-      * Cancel current countdown ticker and start a new one if the event was a TurnChanged event.
-      * Cancel current countdown ticker and stop the actor if the event was a GameFinished event.
-
+3. Roll, used to issue a roll dice command.
+    * Send a SendCommand message containing a RollDice command to the GameManagerActor.	
+    
 ### GameManagerActor class
 _This actor's sole responsibility is to create game actors and forward game commands to them. 
 It also acts as the supervisor for it's child actors. Supervision is out of scope for this workshop, 
@@ -100,22 +84,39 @@ the message in the following manner
 	* Try to retrieve an existing child GameActor.
 		* If the GameActor exists => Forward the command
         * If the GameActor does not exist => Respond with GameDoesNotExist message
-
-### GameController class
-_This class is used to create the REST api for the game engine. The REST api is the door into the game engine. It is used to
-issue commands from the user interface into the game._
+    
+### GameActor class
+_This actor is the heart of the game. It is responsible for handling game commands, applying the resulting events to the domain and managing the turn timer._
 <br/>
 <br/>
-You'll need to implement the following endpoints:
-1. Create, used to create a new game.
-	* Send a CreateGame message to the GameManagerActor.
-    * Return feedback. 
+1. Transform this class into a PersistentActor.
 
-2. Start, used to start an uninitialized game.
-	* Send a SendCommand message containing a StartGame command to the GameManagerActor.
+2. Add a factory method necessary to create this actor.
 
-3. Roll, used to issue a roll dice command.
-    * Send a SendCommand message containing a RollDice command to the GameManagerActor.	
+3. Create a method to handle incoming messages by implementing ReceiveCommand. 
+This method has to react to GameCommands as well as TickCountdown messages (tip: use pattern match to differentiate between event types)
+    * Delegate GameCommand execution to the domain using the existing HandleResult method.
+    * Apply a tick countdown on the domain and persist the message using the HandleChanges method. 
+    (Only apply on a running game)
+    * Unkown message? Log using Akka and stop the countdown ticker.
+
+4. Create a method to handle recovery (state re-build) by implement ReceiveRecover. This handler must
+not have side-effects other than changing persistent actor state i.e. it should
+not perform actions that may fail, such as interacting with external services.
+    * Apply all GameEvents on the domain.
+    * Schedule a countdown tick if recovery is completed to continue the game in it's current state.
+
+5. Complete HandleResult method by replying command execution result to the sender.
+
+6. Complete HandleChanges method. This method will make sure all uncommitted events in the domain are persisted. 
+The following actions need to happen after the events are persisted:
+    * re-apply the events to make sure the domain is in the correct persisted state. 
+    * Mark events commited.
+    * Publish the event using the PublishEvent method.
+    * Countdown ticker management
+      * Schedule a new countdown ticker if the event was a GameStarted event.
+      * Cancel current countdown ticker and start a new one if the event was a TurnChanged event.
+      * Cancel current countdown ticker and stop the actor if the event was a GameFinished event.
 
 [1]: https://getakka.net/articles/concepts/supervision.html "Akka.NET Supervision"	
 [2]: https://github.com/ChristofLauriers/AkkaMjrTwo/blob/master/DB/DB%20init.sql "Initial Database Script"	
