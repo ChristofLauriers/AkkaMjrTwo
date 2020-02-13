@@ -14,7 +14,10 @@ namespace AkkaMjrTwo.StatisticsEngine.Projectors
             Initialize();
         }
 
-        //Add Factory method (GetProps)
+        //Implement Factory method using Props.Create
+        public static Props GetProps()
+        {
+        }
 
         private void Initialize()
         {

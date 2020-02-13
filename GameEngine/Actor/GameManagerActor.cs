@@ -54,29 +54,32 @@ namespace AkkaMjrTwo.GameEngine.Actor
             //  - SendCommand messages
         }
 
-        //Add Factory method (GetProps)
+        //Implement Factory method using Props.Create
+        public static Props GetProps()
+        {
+        }
 
         private bool Handle(CreateGame message)
         {
             var id = new GameId($"Game_{Guid.NewGuid().ToString()}");
 
-            //Retrieve child GameActor and check if it already exists.
+            //Retrieve child GameActor using Context and check if it already exists comparing with ActorRefs.Nobody
             //If GameActor already exists:
-            //  - Respond with GameAlreadyExists message
+            //  - Respond with GameAlreadyExists message to Sender
             //If GameActor does not exist:
             //  - Create new GameActor as a child
-            //  - Respond with GameCreated message
+            //  - Respond with GameCreated message to Sender
 
             return true;
         }
 
         private bool Handle(SendCommand message)
         {
-            //Retrieve child GameActor and check if it already exists.
+            //Retrieve child GameActor using Context and check if it already exists comparing with ActorRefs.Nobody
             //If GameActor exists:
-            //  - Forward the command
+            //  - Forward the command to child
             //If GameActor does not exist:
-            //  - Respond with GameDoesNotExist message
+            //  - Respond with GameDoesNotExist message to Sender
 
             return true;
         }
