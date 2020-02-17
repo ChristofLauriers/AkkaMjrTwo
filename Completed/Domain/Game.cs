@@ -43,12 +43,6 @@ namespace AkkaMjrTwo.Domain
             }
             return this;
         }
-
-        public override Game MarkCommitted()
-        {
-            UncommitedEvents = new List<GameEvent>();
-            return this;
-        }
     }
 
 
@@ -68,18 +62,23 @@ namespace AkkaMjrTwo.Domain
             }
 
             var firstPlayer = players.First();
-            ApplyEvent(new GameStarted(GameId, players, new Turn(firstPlayer, GlobalSettings.TurnTimeoutSeconds)));
+
+            RegisterUncommitedEvents(new GameStarted(GameId, players, new Turn(firstPlayer, GlobalSettings.TurnTimeoutSeconds)));
+
             return this;
         }
 
-        public override Game ApplyEvent(GameEvent arg)
+        public override Game ApplyEvent(GameEvent @event)
         {
-            if (arg is GameStarted gameStarted)
+            Game game = this;
+            if (@event is GameStarted gameStarted)
             {
-                UncommitedEvents.Add(gameStarted);
-                return new RunningGame(GameId, gameStarted.Players, gameStarted.InitialTurn, UncommitedEvents);
+                game = new RunningGame(GameId, gameStarted.Players, gameStarted.InitialTurn, UncommitedEvents);
             }
-            return this;
+
+            MarkCommitted(@event);
+
+            return game;
         }
     }
 
@@ -114,15 +113,11 @@ namespace AkkaMjrTwo.Domain
                 var nextPlayer = GetNextPlayer();
                 if (nextPlayer != null)
                 {
-                    ApplyEvents(diceRolled, new TurnChanged(GameId, new Turn(nextPlayer, GlobalSettings.TurnTimeoutSeconds)));
+                    RegisterUncommitedEvents(diceRolled, new TurnChanged(GameId, new Turn(nextPlayer, GlobalSettings.TurnTimeoutSeconds)));
                 }
                 else
                 {
-                    var game = ApplyEvent(diceRolled);
-                    if (game is RunningGame)
-                    {
-                        ApplyEvent(new GameFinished(GameId, BestPlayers()));
-                    }
+                    RegisterUncommitedEvents(diceRolled, new GameFinished(GameId, BestPlayers()));
                 }
                 return this;
             }
@@ -138,51 +133,45 @@ namespace AkkaMjrTwo.Domain
                 var nextPlayer = GetNextPlayer();
                 if (nextPlayer != null)
                 {
-                    ApplyEvents(timedOut, new TurnChanged(GameId, new Turn(nextPlayer, GlobalSettings.TurnTimeoutSeconds)));
+                    RegisterUncommitedEvents(timedOut, new TurnChanged(GameId, new Turn(nextPlayer, GlobalSettings.TurnTimeoutSeconds)));
                 }
                 else
                 {
-                    ApplyEvents(timedOut, new GameFinished(GameId, BestPlayers()));
+                    RegisterUncommitedEvents(timedOut, new GameFinished(GameId, BestPlayers()));
                 }
             }
             else
             {
-                ApplyEvent(countdownUpdated);
+                RegisterUncommitedEvents(countdownUpdated);
             }
             return this;
         }
 
-        public override Game ApplyEvent(GameEvent arg)
+        public override Game ApplyEvent(GameEvent @event)
         {
             Game game = this;
-            if (arg is TurnChanged turnChanged)
+            if (@event is TurnChanged turnChanged)
             {
                 _turn = turnChanged.Turn;
-                UncommitedEvents.Add(turnChanged);
             }
-            if (arg is DiceRolled diceRolled)
+            if (@event is DiceRolled diceRolled)
             {
                 if (!_rolledNumbers.Exists(x => x.Key.Equals(diceRolled.Player)))
                 {
                     _rolledNumbers.Add(new KeyValuePair<PlayerId, int>(diceRolled.Player, diceRolled.RolledNumber));
                 }
-
-                UncommitedEvents.Add(diceRolled);
             }
-            if (arg is TurnCountdownUpdated turnCountdownUpdated)
+            if (@event is TurnCountdownUpdated turnCountdownUpdated)
             {
                 _turn.SecondsLeft = turnCountdownUpdated.SecondsLeft;
-                UncommitedEvents.Add(turnCountdownUpdated);
             }
-            if (arg is GameFinished gameFinished)
+            if (@event is GameFinished gameFinished)
             {
-                UncommitedEvents.Add(gameFinished);
-                return new FinishedGame(GameId, _players, gameFinished.Winners, UncommitedEvents);
+                game = new FinishedGame(GameId, _players, gameFinished.Winners, UncommitedEvents);
             }
-            if (arg is TurnTimedOut)
-            {
-                UncommitedEvents.Add(arg);
-            }
+
+            MarkCommitted(@event);
+
             return game;
         }
 

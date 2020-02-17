@@ -111,7 +111,7 @@ namespace AkkaMjrTwo.GameEngine.Actor
         {
             PersistAll(_game.UncommitedEvents, ev =>
             {
-                _game = _game.ApplyEvent(ev).MarkCommitted();
+                _game = _game.ApplyEvent(ev);
 
                 PublishEvent(ev);
 

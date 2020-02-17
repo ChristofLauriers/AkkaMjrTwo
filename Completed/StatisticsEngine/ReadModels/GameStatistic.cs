@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace AkkaMjrTwo.StatisticsEngine.ReadModels
 {
@@ -25,5 +26,9 @@ namespace AkkaMjrTwo.StatisticsEngine.ReadModels
         public int NumberRolled { get; set; }
 
         public bool Winner { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public DateTime? Updated { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Akka.Actor;
+﻿using System;
+using Akka.Actor;
 using Akka.Event;
 using AkkaMjrTwo.Domain;
 using System.Linq;
@@ -36,7 +37,8 @@ namespace AkkaMjrTwo.StatisticsEngine.Projectors
                     db.Add(new GameStatistic
                     {
                         GameId = gameId,
-                        PlayerId = player.Value
+                        PlayerId = player.Value,
+                        Created = DateTime.Now
                     });
                 }
                 db.SaveChanges();
@@ -54,6 +56,8 @@ namespace AkkaMjrTwo.StatisticsEngine.Projectors
                 if (statistic != null)
                 {
                     statistic.NumberRolled = @event.RolledNumber;
+                    statistic.Updated = DateTime.Now;
+
                     db.SaveChanges();
                 }
                 else
@@ -75,6 +79,7 @@ namespace AkkaMjrTwo.StatisticsEngine.Projectors
                     if (statistic != null)
                     {
                         statistic.Winner = true;
+                        statistic.Updated = DateTime.Now;
                     }
                     else
                     {

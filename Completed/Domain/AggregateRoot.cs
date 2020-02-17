@@ -4,9 +4,9 @@ namespace AkkaMjrTwo.Domain
 {
     public abstract class AggregateRoot<T, E> where T : AggregateRoot<T, E>
     {
-        public List<E> UncommitedEvents { get; set; }
+        public List<E> UncommitedEvents { get; protected set; }
 
-        protected Id<T> Id { get; set; }
+        protected Id<T> Id { get; }
 
         protected AggregateRoot(Id<T> id)
         {
@@ -14,17 +14,19 @@ namespace AkkaMjrTwo.Domain
             UncommitedEvents = new List<E>();
         }
 
-        public abstract T ApplyEvent(E arg);
-        public abstract T MarkCommitted();
+        public abstract T ApplyEvent(E @event);
 
-        protected T ApplyEvents(params E[] args)
+        public void MarkCommitted(E @event)
         {
-            T result = null;
-            foreach (var arg in args)
+            UncommitedEvents.Remove(@event);
+        }
+
+        protected void RegisterUncommitedEvents(params E[] events)
+        {
+            foreach (var @event in events)
             {
-                result = ApplyEvent(arg);
+                UncommitedEvents.Add(@event);
             }
-            return result;
         }
     }
 }
