@@ -117,7 +117,12 @@ namespace AkkaMjrTwo.Domain
                 }
                 else
                 {
-                    RegisterUncommitedEvents(diceRolled, new GameFinished(GameId, BestPlayers()));
+                    //collect all previous rolls to finish the game
+                    var rolls = _rolledNumbers.ToList();
+                    //add the last roll
+                    rolls.Add(new KeyValuePair<PlayerId, int>(diceRolled.Player, diceRolled.RolledNumber));
+                    
+                    RegisterUncommitedEvents(diceRolled, new GameFinished(GameId, BestPlayers(rolls)));
                 }
                 return this;
             }
@@ -137,7 +142,7 @@ namespace AkkaMjrTwo.Domain
                 }
                 else
                 {
-                    RegisterUncommitedEvents(timedOut, new GameFinished(GameId, BestPlayers()));
+                    RegisterUncommitedEvents(timedOut, new GameFinished(GameId, BestPlayers(_rolledNumbers)));
                 }
             }
             else
@@ -146,7 +151,7 @@ namespace AkkaMjrTwo.Domain
             }
             return this;
         }
-
+        
         public override Game ApplyEvent(GameEvent @event)
         {
             Game game = this;
@@ -175,20 +180,17 @@ namespace AkkaMjrTwo.Domain
             return game;
         }
 
-        private List<PlayerId> BestPlayers()
+        private static List<PlayerId> BestPlayers(IReadOnlyCollection<KeyValuePair<PlayerId, int>> rolls)
         {
-            var highest = HighestRolledNumber();
-            var best = _rolledNumbers.Where(x => x.Value == highest).Select(x => x.Key).ToList();
+            var best = new List<PlayerId>();
+
+            if (!rolls.Any())
+                return best;
+
+            var highest = rolls.Select(x => x.Value).Max();
+            best = rolls.Where(x => x.Value == highest).Select(x => x.Key).ToList();
 
             return best;
-        }
-
-        private int HighestRolledNumber()
-        {
-            if (!_rolledNumbers.Any())
-                return -1;
-
-            return _rolledNumbers.Select(x => x.Value).Max();
         }
 
         private PlayerId GetNextPlayer()
